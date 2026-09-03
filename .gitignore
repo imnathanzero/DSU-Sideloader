@@ -9,3 +9,42 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Build outputs
+**/build/
+**/out/
+*.apk
+*.aab
+*.apks
+*.zip
+
+# Android / Gradle generated files
+.navigation/
+*.hprof
+*.log
+
+# Kotlin / Java generated files
+.kotlin/
+
+# Native build artifacts
+**/.cxx/
+**/.externalNativeBuild/
+*.so
+
+# IDE metadata
+.idea/
+*.ipr
+*.iws
+
+# OS/editor files
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+tmp/
