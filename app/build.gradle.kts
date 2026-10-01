@@ -73,6 +73,7 @@ android {
         }
         create("miniDebug") {
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
             isDebuggable = true
             isMinifyEnabled = true
             isShrinkResources = true
