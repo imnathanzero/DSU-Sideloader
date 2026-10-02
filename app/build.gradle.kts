@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 
 fun getReleaseSigningConfig(): File {
@@ -36,18 +37,23 @@ android {
     }
 
     signingConfigs {
+        val keystoreBase64 = System.getenv("SIGNING_KEYSTORE_BASE64")
         val releaseSigningConfig = getReleaseSigningConfig()
-        if (releaseSigningConfig.exists()) {
+        if (!keystoreBase64.isNullOrBlank()) {
+            // CI: keystore + credentials supplied via GitHub Actions secrets
+            // (SIGNING_KEYSTORE_BASE64 / SIGNING_STORE_PASSWORD / SIGNING_KEY_ALIAS / SIGNING_KEY_PASSWORD).
             create("release") {
-                /**
-                 * .sign/dsu_sideloader.prop
-                 *
-                 * keystore=some/path/keystore.jks
-                 * keystore_pw=keystore_password
-                 * alias=alias
-                 * alias_pw=alias_password
-                 *
-                 */
+                val keystoreFile = File.createTempFile("release-signing", ".jks")
+                keystoreFile.writeBytes(Base64.getDecoder().decode(keystoreBase64.trim()))
+                storeFile = keystoreFile
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        } else if (releaseSigningConfig.exists()) {
+            // Local: .sign/dsu_sideloader.prop
+            // keystore=some/path/keystore.jks / keystore_pw=... / alias=... / alias_pw=...
+            create("release") {
                 val props = Properties()
                 props.load(releaseSigningConfig.inputStream())
 
@@ -61,9 +67,7 @@ android {
 
     buildTypes {
         getByName("release") {
-            if (getReleaseSigningConfig().exists()) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

@@ -24,10 +24,21 @@ jobs:
       run: chmod +x gradlew
       
     - name: Build with Gradle
-      run: ./gradlew assembleMiniDebug
+      env:
+        SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+      run: ./gradlew assembleMiniDebug assembleRelease
       
-    - name: Archive artifacts
+    - name: Archive miniDebug APK
       uses: actions/upload-artifact@v7
       with:
         name: outputs-apk-minidebug
         path: app/build/outputs/apk/miniDebug
+
+    - name: Archive release APK
+      uses: actions/upload-artifact@v7
+      with:
+        name: outputs-apk-release
+        path: app/build/outputs/apk/release
