@@ -241,4 +241,30 @@
 
     <string name="close_app">Close app</string>
     <string name="close_app_question">Close app?</string>
+
+    <!-- Partitions Manager -->
+    <string name="partitions">Partitions</string>
+    <string name="partitions_manager">Partition Manager</string>
+    <string name="partitions_manager_desc">Manage and mount installed DSU partitions</string>
+    <string name="mount_output_path">Mount output: /data/local/DSUMounts</string>
+    <string name="no_partitions_found">No installed partitions found</string>
+    <string name="no_partitions_desc">DSU partitions will appear here when an installation is active or present in /data/gsi</string>
+    <string name="mount">Mount</string>
+    <string name="unmount">Unmount</string>
+    <string name="mount_all">Mount all</string>
+    <string name="unmount_all">Unmount all</string>
+    <string name="mounted">Mounted</string>
+    <string name="unmounted">Unmounted</string>
+    <string name="mount_ro">Read-only</string>
+    <string name="mount_rw">Read-write</string>
+    <string name="delete_partition">Delete partition</string>
+    <string name="delete_partition_warn">Are you sure you want to delete %1$s? All data in this partition will be permanently lost.</string>
+    <string name="mount_custom_image">Mount custom image</string>
+    <string name="mount_custom_image_desc">Mount an arbitrary image file to /data/local/DSUMounts</string>
+    <string name="image_path">Image file path</string>
+    <string name="partition_name">Partition name</string>
+    <string name="requires_root_partitions">Partition management requires root privileges. Please run the app in Root mode to use this feature.</string>
+    <string name="copy_mount_path">Copy path</string>
+    <string name="mount_path_copied">Mount path copied to clipboard</string>
+    <string name="refresh">Refresh</string>
 </resources>

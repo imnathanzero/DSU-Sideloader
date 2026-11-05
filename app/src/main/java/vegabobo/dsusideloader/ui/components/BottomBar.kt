@@ -3,8 +3,10 @@ package vegabobo.dsusideloader.ui.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -18,6 +20,7 @@ import vegabobo.dsusideloader.ui.screen.Destinations
 fun AppBottomBar(
     currentDestination: String,
     onNavigate: (String) -> Unit,
+    showPartitions: Boolean = false,
 ) {
     NavigationBar {
         NavigationBarItem(
@@ -39,6 +42,27 @@ fun AppBottomBar(
             },
             label = { Text(text = stringResource(R.string.installation)) },
         )
+        if (showPartitions) {
+            NavigationBarItem(
+                selected = currentDestination == Destinations.Partitions,
+                onClick = {
+                    if (currentDestination != Destinations.Partitions) {
+                        onNavigate(Destinations.Partitions)
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = if (currentDestination == Destinations.Partitions) {
+                            Icons.Filled.Storage
+                        } else {
+                            Icons.Outlined.Storage
+                        },
+                        contentDescription = stringResource(R.string.partitions),
+                    )
+                },
+                label = { Text(text = stringResource(R.string.partitions)) },
+            )
+        }
         NavigationBarItem(
             selected = currentDestination == Destinations.Preferences,
             onClick = {
