@@ -21,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Bolt
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.NewReleases
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.SdCard
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Terminal
@@ -57,6 +59,8 @@ import vegabobo.dsusideloader.ui.components.SimpleCard
 import vegabobo.dsusideloader.ui.components.Title
 import vegabobo.dsusideloader.ui.components.TopBar
 import vegabobo.dsusideloader.ui.screen.Destinations
+import vegabobo.dsusideloader.ui.sdialogs.ThemeSelectionSheet
+import vegabobo.dsusideloader.ui.theme.ThemeMode
 import vegabobo.dsusideloader.util.OperationMode
 import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
@@ -165,6 +169,60 @@ fun Settings(
             )
         },
     ) {
+        // Appearance Settings Group
+        Title(
+            title = stringResource(id = R.string.appearance),
+            modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
+        )
+        SimpleCard(addPadding = false) {
+            val themeSubtitle = when (uiState.themeMode) {
+                ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                ThemeMode.DARK -> stringResource(R.string.theme_dark)
+            }
+            SettingsItemRow(
+                title = stringResource(id = R.string.theme),
+                description = themeSubtitle,
+                icon = Icons.Outlined.DarkMode,
+                iconTint = MaterialTheme.colorScheme.primary,
+                iconBackground = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                onClick = {
+                    settingsViewModel.updateSheetDisplay(DialogSheetState.THEME_SELECTION)
+                },
+                trailingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(14.dp),
+                    )
+                },
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 68.dp, end = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+            )
+
+            val isMonetSupported = settingsViewModel.isMonetSupported()
+            val monetDesc = if (isMonetSupported) {
+                stringResource(id = R.string.monet_dynamic_color_desc)
+            } else {
+                stringResource(id = R.string.monet_not_supported)
+            }
+            SettingsItemRow(
+                title = stringResource(id = R.string.monet_dynamic_color),
+                description = monetDesc,
+                icon = Icons.Outlined.Palette,
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                iconBackground = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
+                showToggle = true,
+                isEnabled = isMonetSupported,
+                isChecked = if (isMonetSupported) uiState.useMonet else false,
+                onClick = { settingsViewModel.togglePreference(AppPrefs.USE_MONET, !it) },
+            )
+        }
+
         // Installation Settings Group
         Title(
             title = stringResource(id = R.string.installation),
@@ -333,6 +391,18 @@ fun Settings(
     }
 
     when (uiState.dialogSheetDisplay) {
+        DialogSheetState.THEME_SELECTION ->
+            ThemeSelectionSheet(
+                currentTheme = uiState.themeMode,
+                onSelectTheme = {
+                    settingsViewModel.setThemeMode(it)
+                    settingsViewModel.updateSheetDisplay(DialogSheetState.NONE)
+                },
+                onDismiss = {
+                    settingsViewModel.updateSheetDisplay(DialogSheetState.NONE)
+                },
+            )
+
         DialogSheetState.BUILT_IN_INSTALLER ->
             DialogLikeBottomSheet(
                 title = stringResource(id = R.string.experimental_feature),

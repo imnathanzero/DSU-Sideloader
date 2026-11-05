@@ -8,7 +8,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,20 +23,26 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
 import vegabobo.dsusideloader.model.Session
+import vegabobo.dsusideloader.preferences.AppPrefs
 import vegabobo.dsusideloader.service.PrivilegedProvider
 import vegabobo.dsusideloader.service.PrivilegedRootService
 import vegabobo.dsusideloader.service.PrivilegedService
 import vegabobo.dsusideloader.service.PrivilegedSystemService
 import vegabobo.dsusideloader.ui.screen.Navigation
-import vegabobo.dsusideloader.ui.theme.DSUHelperTheme
+import vegabobo.dsusideloader.ui.theme.SysphereTheme
+import vegabobo.dsusideloader.ui.theme.ThemeMode
 import vegabobo.dsusideloader.util.OperationMode
 import vegabobo.dsusideloader.util.OperationModeUtils
+import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListener {
 
     @Inject
     lateinit var session: Session
+
+    @Inject
+    lateinit var dataStore: DataStore<Preferences>
 
     private val tag = this.javaClass.simpleName
 
@@ -134,7 +146,15 @@ class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListe
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            DSUHelperTheme {
+            val prefs by dataStore.data.collectAsStateWithLifecycle(initialValue = emptyPreferences())
+            val themeModeStr = prefs[stringPreferencesKey(AppPrefs.THEME_MODE)] ?: "system"
+            val useMonet = prefs[booleanPreferencesKey(AppPrefs.USE_MONET)] ?: true
+            val themeMode = ThemeMode.fromString(themeModeStr)
+
+            SysphereTheme(
+                themeMode = themeMode,
+                dynamicColor = useMonet,
+            ) {
                 Navigation()
             }
         }

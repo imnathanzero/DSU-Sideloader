@@ -134,6 +134,16 @@
 
     <string name="settings">Settings</string>
 
+    <!-- Appearance -->
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="monet_dynamic_color">Dynamic Color (Monet)</string>
+    <string name="monet_dynamic_color_desc">Adapt application surfaces and accents to your system wallpaper</string>
+    <string name="monet_not_supported">Dynamic Color is only available on Android 12 and above</string>
+
     <string name="experimental_feature">Experimental feature</string>
     <string name="experimental_feature_description">This feature is under testing and may be unstable, are you sure?</string>
 
