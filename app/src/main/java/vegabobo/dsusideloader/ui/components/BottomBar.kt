@@ -1,10 +1,10 @@
 package vegabobo.dsusideloader.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.Icon
@@ -33,9 +33,9 @@ fun AppBottomBar(
             icon = {
                 Icon(
                     imageVector = if (currentDestination == Destinations.Homepage) {
-                        Icons.Filled.Home
+                        Icons.Filled.InstallMobile
                     } else {
-                        Icons.Outlined.Home
+                        Icons.Outlined.InstallMobile
                     },
                     contentDescription = stringResource(R.string.installation),
                 )
