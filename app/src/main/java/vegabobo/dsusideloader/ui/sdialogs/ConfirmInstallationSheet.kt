@@ -3,7 +3,7 @@ package vegabobo.dsusideloader.ui.sdialogs
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +29,7 @@ fun ConfirmInstallationSheet(
         content = {
             Spacer(modifier = Modifier.padding(4.dp))
             DialogItem(
-                icon = Icons.Outlined.InsertDriveFile,
+                icon = Icons.AutoMirrored.Outlined.InsertDriveFile,
                 title = "${stringResource(id = R.string.selected_file)}:",
                 text = filename,
                 textColor = MaterialTheme.colorScheme.onBackground,
