@@ -274,4 +274,22 @@
     <string name="refresh">Refresh</string>
     <string name="kernel_no_loop_warning">Your kernel lacks loop device support (CONFIG_BLK_DEV_LOOP). Mounting raw partition images may fail unless you use a kernel with loop support.</string>
     <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
+
+    <!-- Live Notification & Alerts -->
+    <string name="notification_channel_name">DSU Installation</string>
+    <string name="notification_channel_description">Real-time installation progress and status alerts</string>
+    <string name="notification_alerts_channel_name">DSU Alerts</string>
+    <string name="notification_alerts_channel_description">Important alerts when DSU installation completes or fails</string>
+    <string name="notification_installing_title">Installing Dynamic System</string>
+    <string name="notification_preparing_title">Preparing Dynamic System</string>
+    <string name="notification_completed_title">Installation Complete</string>
+    <string name="notification_completed_text">Dynamic System is ready. Tap to reboot or restart your device.</string>
+    <string name="notification_failed_title">DSU Installation Failed</string>
+    <string name="notification_cancel_action">Cancel</string>
+    <string name="notification_reboot_action">Reboot to DSU</string>
+    <string name="notification_open_action">Open</string>
+    <string name="notification_view_action">View</string>
+    <string name="live_alert_banner_ready">Dynamic System ready to boot</string>
+    <string name="live_alert_banner_tap_to_view">Tap to view installation</string>
+    <string name="live_alert_banner_failed">Installation encountered an error</string>
 </resources>

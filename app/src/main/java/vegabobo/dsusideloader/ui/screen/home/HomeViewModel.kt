@@ -20,8 +20,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import vegabobo.dsusideloader.BuildConfig
+import vegabobo.dsusideloader.R
 import vegabobo.dsusideloader.core.BaseViewModel
 import vegabobo.dsusideloader.core.StorageManager
+import vegabobo.dsusideloader.installer.LiveInstallationManager
 import vegabobo.dsusideloader.installer.adb.AdbInstallationHandler
 import vegabobo.dsusideloader.installer.privileged.DsuInstallationHandler
 import vegabobo.dsusideloader.installer.privileged.LogcatDiagnostic
@@ -45,6 +47,7 @@ class HomeViewModel @Inject constructor(
     override val dataStore: DataStore<Preferences>,
     private val storageManager: StorageManager,
     var session: Session,
+    val liveInstallationManager: LiveInstallationManager,
 ) : BaseViewModel(dataStore) {
 
     private val tag = this.javaClass.simpleName
@@ -87,6 +90,7 @@ class HomeViewModel @Inject constructor(
         session.userSelection.selectedFiles.clear()
         session.userSelection.selectedFileName = ""
         session.userSelection.selectedFileUri = Uri.EMPTY
+        liveInstallationManager.cancel()
         _uiState.update {
             val installationStep = if (it.isDsuInstalled) {
                 InstallationStep.DSU_ALREADY_INSTALLED
@@ -107,6 +111,13 @@ class HomeViewModel @Inject constructor(
     //
 
     init {
+        liveInstallationManager.onCancelRequested = {
+            onClickCancelInstallationButton()
+        }
+        liveInstallationManager.onRebootRequested = {
+            onClickRebootToDynOS()
+        }
+
         // Check if a DSU is already installed
         // Root-only because MANAGE_DYNAMIC_SYSTEM is required
         if (session.isRoot()) {
@@ -218,6 +229,12 @@ class HomeViewModel @Inject constructor(
     fun onConfirmInstallationSheet() {
         dismissSheet()
         updateInstallationCard { it.copy(installationStep = InstallationStep.PROCESSING) }
+        liveInstallationManager.startInstallation(
+            step = InstallationStep.PROCESSING,
+            title = application.getString(R.string.notification_preparing_title),
+            stepText = application.getString(R.string.processing),
+            isIndeterminate = true,
+        )
         installationJob = Job()
         viewModelScope.launch(Dispatchers.IO + installationJob) {
             session.preferences.isUnmountSdCard = readBoolPref(AppPrefs.UMOUNT_SD)
@@ -328,6 +345,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClickCancelInstallationButton() {
+        liveInstallationManager.cancel()
         resetInstallationCard()
         if (session.getOperationMode() != OperationMode.ADB &&
             logger != null && logger!!.isLogging.get()
@@ -366,6 +384,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClickDiscardGsi() {
+        liveInstallationManager.cancel()
         updateInstallationCard { it.copy(installationStep = InstallationStep.PROCESSING) }
         PrivilegedProvider.run {
             remove()
@@ -563,44 +582,138 @@ class HomeViewModel @Inject constructor(
 
     private fun onRootInstallationSuccess() {
         updateInstallationCard { it.copy(installationStep = InstallationStep.INSTALL_SUCCESS_REBOOT_DYN_OS) }
+        liveInstallationManager.notifySuccess(
+            canReboot = true,
+            title = application.getString(R.string.notification_completed_title),
+            text = application.getString(R.string.installation_finished),
+        )
     }
 
     private fun onInstallationSuccess() {
         updateInstallationCard { it.copy(installationStep = InstallationStep.INSTALL_SUCCESS) }
+        liveInstallationManager.notifySuccess(
+            canReboot = session.isRoot(),
+            title = application.getString(R.string.notification_completed_title),
+            text = application.getString(R.string.installation_finished_rootless),
+        )
     }
 
     private fun onLogLineReceived() {
         _uiState.update { it.copy(installationLogs = logger!!.logs) }
     }
 
-    private fun onStepUpdate(step: InstallationStep) =
+    private fun onStepUpdate(step: InstallationStep) {
         updateInstallationCard { it.copy(installationStep = step) }
+        val stepString = getStepDescription(step)
+        val isIndeterminate = step == InstallationStep.PROCESSING ||
+            step == InstallationStep.PROCESSING_LOG_READABLE ||
+            step == InstallationStep.WAITING_USER_CONFIRMATION
+        liveInstallationManager.updateStep(
+            step = step,
+            stepText = stepString,
+            isIndeterminate = isIndeterminate,
+        )
+    }
 
-    private fun onPreparationProgressUpdate(progress: Float) =
+    private fun onPreparationProgressUpdate(progress: Float) {
         updateInstallationCard { it.copy(installationProgress = progress) }
+        liveInstallationManager.updateProgress(
+            progress = progress,
+            partition = "",
+            stepText = getStepDescription(uiState.value.installationCard.installationStep),
+        )
+    }
 
-    private fun onInstallationError(error: InstallationStep, errorContent: String) =
-        updateInstallationCard {
-            if (error == InstallationStep.ERROR_SELINUX && !session.isRoot()) {
-                it.copy(
-                    installationStep = InstallationStep.ERROR_SELINUX_ROOTLESS,
-                    errorText = errorContent,
-                )
-            } else {
-                it.copy(installationStep = error, errorText = errorContent)
-            }
+    private fun onInstallationError(error: InstallationStep, errorContent: String) {
+        val finalStep = if (error == InstallationStep.ERROR_SELINUX && !session.isRoot()) {
+            InstallationStep.ERROR_SELINUX_ROOTLESS
+        } else {
+            error
         }
+        updateInstallationCard {
+            it.copy(installationStep = finalStep, errorText = errorContent)
+        }
+        val errorDescription = getErrorDescription(finalStep, errorContent)
+        liveInstallationManager.notifyError(
+            step = finalStep,
+            errorContent = errorDescription,
+            title = application.getString(R.string.notification_failed_title),
+        )
+    }
 
-    private fun onInstallationProgressUpdate(progress: Float, partition: String) =
+    private fun onInstallationProgressUpdate(progress: Float, partition: String) {
         updateInstallationCard {
             it.copy(currentPartitionText = partition, installationProgress = progress)
         }
+        liveInstallationManager.updateProgress(
+            progress = progress,
+            partition = partition,
+            stepText = application.getString(R.string.installing_partition, partition),
+        )
+    }
 
-    private fun onCreatePartition(partition: String) =
+    private fun onCreatePartition(partition: String) {
         updateInstallationCard {
             it.copy(
                 installationStep = InstallationStep.CREATING_PARTITION,
                 currentPartitionText = partition,
             )
         }
+        liveInstallationManager.updateStep(
+            step = InstallationStep.CREATING_PARTITION,
+            stepText = application.getString(R.string.creating_partition, partition),
+            partition = partition,
+            isIndeterminate = true,
+        )
+    }
+
+    private fun getStepDescription(step: InstallationStep): String {
+        return when (step) {
+            InstallationStep.PROCESSING -> application.getString(R.string.processing)
+            InstallationStep.COPYING_FILE -> application.getString(R.string.copying_file)
+            InstallationStep.DECOMPRESSING_XZ -> application.getString(R.string.decompressing_xz)
+            InstallationStep.COMPRESSING_TO_GZ -> application.getString(R.string.compressing_to_gz)
+            InstallationStep.DECOMPRESSING_GZIP, InstallationStep.EXTRACTING_FILE ->
+                application.getString(R.string.extracting_file)
+            InstallationStep.DISCARD_CURRENT_GSI -> application.getString(R.string.discarding)
+            InstallationStep.WAITING_USER_CONFIRMATION -> application.getString(R.string.installation_prompt)
+            InstallationStep.PROCESSING_LOG_READABLE -> application.getString(R.string.installing)
+            InstallationStep.INSTALLING, InstallationStep.INSTALLING_ROOTED ->
+                application.getString(R.string.installing)
+            InstallationStep.CREATING_PARTITION -> application.getString(R.string.processing)
+            InstallationStep.REQUIRES_ADB_CMD_TO_CONTINUE ->
+                application.getString(R.string.require_adb_cmd_to_continue)
+            InstallationStep.INSTALL_SUCCESS ->
+                application.getString(R.string.installation_finished_rootless)
+            InstallationStep.INSTALL_SUCCESS_REBOOT_DYN_OS ->
+                application.getString(R.string.installation_finished)
+            else -> ""
+        }
+    }
+
+    private fun getErrorDescription(step: InstallationStep, errorText: String): String {
+        return when (step) {
+            InstallationStep.ERROR ->
+                application.getString(R.string.unknown_error, errorText)
+            InstallationStep.ERROR_CANCELED ->
+                application.getString(R.string.installation_canceled)
+            InstallationStep.ERROR_REQUIRES_DISCARD_DSU ->
+                application.getString(R.string.discard_dsu_otg)
+            InstallationStep.ERROR_ALREADY_RUNNING_DYN_OS ->
+                application.getString(R.string.already_running_dsu)
+            InstallationStep.ERROR_CREATE_PARTITION ->
+                application.getString(R.string.failed_create_partition, errorText)
+            InstallationStep.ERROR_EXTERNAL_SDCARD_ALLOC ->
+                application.getString(R.string.allocation_error)
+            InstallationStep.ERROR_NO_AVAIL_STORAGE ->
+                application.getString(R.string.storage_error)
+            InstallationStep.ERROR_F2FS_WRONG_PATH ->
+                application.getString(R.string.fs_features_error)
+            InstallationStep.ERROR_EXTENTS ->
+                application.getString(R.string.extents_error_title)
+            InstallationStep.ERROR_SELINUX, InstallationStep.ERROR_SELINUX_ROOTLESS ->
+                application.getString(R.string.selinux_error)
+            else -> errorText.ifEmpty { application.getString(R.string.unknown_error) }
+        }
+    }
 }
