@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Primary Base Orbital Ring (Host System Sphere) -->
+    <path
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.85"
+        android:pathData="M 54,31 A 23,23 0 1,0 54.01,31 Z" />
+
+    <!-- Rotated Secondary Orbital Ring (Alternative System Layer / GSI) -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:rotation="-38">
+
+        <!-- Outer Elliptical Orbit -->
+        <path
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="3.2"
+            android:strokeLineCap="round"
+            android:pathData="M 54,38 A 27,16 0 1,0 54.01,38 Z" />
+
+        <!-- Satellite Node on Secondary Orbit -->
+        <path
+            android:fillColor="#38BDF8"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="1.2"
+            android:pathData="M 81,54 A 3.6,3.6 0 1,0 81.01,54 Z" />
+    </group>
+
+    <!-- Central Core Sphere -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,48 A 6,6 0 1,0 54.01,48 Z" />
+
+    <!-- Inner Core Dot Accent -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M 54,52 A 2,2 0 1,0 54.01,52 Z" />
+</vector>

@@ -123,7 +123,7 @@ fun UpdaterCard(
                     shadowElevation = 4.dp,
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.app_icon_mini),
+                        painter = painterResource(id = R.drawable.app_icon_hero),
                         contentDescription = stringResource(id = R.string.app_name),
                         modifier = Modifier
                             .size(96.dp)
@@ -134,7 +134,7 @@ fun UpdaterCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // App Name
+            // App Name & Tagline
             Text(
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium,
@@ -142,7 +142,16 @@ fun UpdaterCard(
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = stringResource(id = R.string.app_tagline),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Metadata Badges Row (Version, Build type, Dynamic Partitions)
             FlowRow(

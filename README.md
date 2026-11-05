@@ -1,71 +1,43 @@
-# DSU Sideloader
+# Sysphere
 
-A simple app made to help users easily install GSIs via DSU's Android feature.
-<div>
-<img src="https://raw.githubusercontent.com/VegaBobo/DSU-Sideloader/master/other/preview_1.png" alt="preview" width="200"/>  
-<img src="https://raw.githubusercontent.com/VegaBobo/DSU-Sideloader/master/other/preview_2.png" alt="preview" width="200"/>  
-</div>
+> *Explore beyond your system.*
+
+Sysphere (*pronounced Sis-feer*) is a modern, minimal, and intuitive Android application designed to install and manage Generic System Images (GSIs) through Android's native Dynamic System Updates (DSU) feature — completely isolated from your host partitions.
+
+Originally created as **DSU Sideloader** by [VegaBobo](https://github.com/VegaBobo).
 
 ## Requirements
-- Android 10 or higher
+- Android 10 (API 29) or higher
 - Unlocked Bootloader
 - Device with Dynamic Partitions
-- A GSI you want to use!
+- Compatible GSI image (`.img`, `.gz`, `.xz`, or DSU `.zip`)
 
 Community GSIs: https://github.com/phhusson/treble_experimentations/wiki/Generic-System-Image-%28GSI%29-list
 
 Google GSIs: https://developer.android.com/topic/generic-system-image/releases
 
-**Remember to use GSIs compatible with your architeture, vndk implementation..*
+*\*Ensure selected GSIs match your device architecture (ARM64) and VNDK requirements.*
 
 ## Downloads
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/vegabobo.dsusideloader/)
+Download the latest release from the [GitHub Releases](https://github.com/imnathanzero/DSU-Sideloader/releases).
 
-Or download the latest APK from the [Releases Section](https://github.com/VegaBobo/DSU-Sideloader/releases/latest).
-For testing builds, you can check artifacts at [Actions](https://github.com/VegaBobo/DSU-Sideloader/actions) tab
+## How to use Sysphere?
+1. **Setup Storage**: Allow Sysphere access to a directory via Storage Access Framework (SAF) for temporary decompression.
+2. **Select GSI**: Pick a `.img`, `.gz`, `.xz`, or DSU `.zip` image.
+3. **Configure Userdata**: Choose allocation size for the secondary system userdata.
+4. **Install**: Tap Install and follow the guided wizard.
+5. **Boot & Test**: Once finished, reboot directly into your Dynamic System.
 
-## How to use?
-1. Install app
-2. When opening for the first time, you need to give read/write permission to a folder, create a new folder and allow access  
-   **this folder will be used to store temporary files, like extracted GSIs from compressed files)*
-3. Select a GSI to install  
-   **accepted formats are: gz, xz, img and zip (only DSU packages)
-4. You can customize installation as you want  
-   **like changing userdata size for dynamic system*  
-   **changing gsi file size is not recommended (let app do it automatically)*
-5. Tap on "Install"
-6. Wait until finishes! (it may take a some time)
-7. Once it finishes, next step may vary:
-	- If built-in installer is enabled, no extra step is required.
-	- When built-in installer is disabled, on rooted/system/shizuku operation mode, DSU screen will appear, prompting you to confirm installation, after that, check your notifications, DSU should start installing GSI.
-	- On ADB operation mode, you will be prompted to run a command in adb, once you run, DSU screen will appear asking you to confirm installation, after that, DSU should start installing GSI.
-8. Once dynamic system is ready, you can boot it through notifications, or, if operation mode is supported, directly from our app.
+## Operation Modes
 
-For more usage information, you can check [Operation modes](#operation-modes)
+Sysphere supports multiple operation modes, automatically selecting the most capable mode available on your device:
 
-## Operation modes
-
-DSU Sideloader support multiple operation modes, they will define how our app will work, also, the operation mode is obtained automatically, and by now, is impossible to change it manually, the picked operation mode will be the best available (the priority is written below, in which, the most feature supported, is the highest number, and the most basic one is the lowest).
-
-1. ADB: Default operation mode when other modes aren't available
-- Only prepare selected image to be installed via DSU system-app
-- Requires adb command to start installation (which will invoke DSU system-app to install the prepared file)
-2. Shizuku: When running app with Shizuku (Obtained when Shizuku permission is granted)
-- Same as ADB, however, it does not require to run any adb command
-- Support tracking installation progress ¹ ² ³
-- Support installation diagnostics (if a common error is detected, it may give you useful information) ¹ ³
-3. Root: When running app with root permissions (Obtained when user grant root permission)
-- All features avaiable in Shizuku, however, does not require any special permissions
-- DynamicSystem API features (check if DSU is installed, reboot to DSU, discard..., everthing directly from app)
-- Support built-in DSU installer ⁴ ⁵
-4. System mode: When running as system-app (installed in `/system/priv-app`)
-- All features avaiable in Shizuku
-- Fixes for some common gsi/dsu-related SELinux denials
-5. System/Root mode: When running as system-app with granted root permission
-- All features available in root and system operation mode
+1. **ADB**: Default unprivileged mode; prepares images and provides exact commands for execution via PC or on-device local ADB tools (LADB, WebADB, Shizuku Rish).
+2. **Shizuku**: Privilege escalation via Shizuku API; triggers installation without manual commands and enables live logcat diagnostics.
+3. **Root**: Direct integration via `libsu`; supports the fast built-in installer (`IGsiService` / Ashmem) and direct one-click reboot/discard actions.
+4. **System Mode**: Running as a privileged system application in `/system/priv-app`.
+5. **System/Root Mode**: Combines system privilege and root execution for maximum compatibility across strict OEM SELinux policies.
 
 ¹ Requires READ_LOGS permission.
 <br>

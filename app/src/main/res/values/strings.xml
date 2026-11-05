@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">DSU Sideloader</string>
+    <string name="app_name" translatable="false">Sysphere</string>
+    <string name="app_tagline">Explore beyond your system.</string>
+    <string name="app_pronunciation" translatable="false">Sis-feer</string>
+    <string name="brand_description">Sysphere provides an intuitive, reliable gateway to explore alternative Android system environments using Dynamic System Updates.</string>
+    <string name="original_attribution">Originally created as DSU Sideloader by VegaBobo. Rebranded and enhanced as Sysphere.</string>
 
     <!--
         Home screen
@@ -18,11 +22,11 @@
     <string name="continue_anyway">Continue anyway</string>
 
     <string name="missing_permission">Missing permission</string>
-    <string name="missing_permission_description">DSU Sideloader requires READ_LOGS permission (which allows logcat reading).\nThis permission is used to obtain installation progress and diagnose errors in DSU installation.\n\n** Granting this permission may require a application restart.</string>
+    <string name="missing_permission_description">Sysphere requires READ_LOGS permission (which allows logcat reading).\nThis permission is used to obtain installation progress and diagnose errors in DSU installation.\n\n** Granting this permission may require an application restart.</string>
     <string name="granting_permission">Waiting service to grant permission, please wait…</string>
 
     <string name="unlocked_bl_warn">Unlocked bootloader</string>
-    <string name="unlocked_bl_warn_desc">DSU Sideloader requires unlocked bootloader, installing images with locked bootloader may be dangerous in some devices, before using this app, you: \n- MUST unlock bootloader.\n- MUST have some way to restore device stock firmware.\n- RECOMMENDED to do a full backup.\nThis app have been made to be used by developers and advanced users, you have been warned.</string>
+    <string name="unlocked_bl_warn_desc">Sysphere requires an unlocked bootloader. Installing images with locked bootloader may be dangerous on some devices. Before using this app, you: \n- MUST unlock bootloader.\n- MUST have a way to restore stock firmware.\n- RECOMMENDED to perform a full backup.\nThis app is designed for developers and advanced users. You have been warned.</string>
 
     <!-- Installation card -->
     <string name="select_gsi_info">Select a file to be installed</string>
@@ -204,7 +208,7 @@
     <string name="supported">Supported</string>
     <string name="issues_and_feedback">Issues &amp; Feedback</string>
     <string name="issues_and_feedback_desc">Report bugs or request features on GitHub</string>
-    <string name="license_notice">DSU Sideloader is free and open-source software (GPL v3)</string>
+    <string name="license_notice">Sysphere is free and open-source software (GPL v3)</string>
     <string name="check_updates_now">Check now</string>
     <string name="checking_updates">Checking for updates…</string>
     <string name="downloading_update">Downloading update: %1$d%%</string>
@@ -276,15 +280,15 @@
     <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
 
     <!-- Live Notification & Alerts -->
-    <string name="notification_channel_name">DSU Installation</string>
+    <string name="notification_channel_name">Sysphere Installation</string>
     <string name="notification_channel_description">Real-time installation progress and status alerts</string>
-    <string name="notification_alerts_channel_name">DSU Alerts</string>
+    <string name="notification_alerts_channel_name">Sysphere Alerts</string>
     <string name="notification_alerts_channel_description">Important alerts when DSU installation completes or fails</string>
-    <string name="notification_installing_title">Installing Dynamic System</string>
+    <string name="notification_installing_title">Sysphere Installation</string>
     <string name="notification_preparing_title">Preparing Dynamic System</string>
     <string name="notification_completed_title">Installation Complete</string>
     <string name="notification_completed_text">Dynamic System is ready. Tap to reboot or restart your device.</string>
-    <string name="notification_failed_title">DSU Installation Failed</string>
+    <string name="notification_failed_title">Installation Failed</string>
     <string name="notification_cancel_action">Cancel</string>
     <string name="notification_reboot_action">Reboot to DSU</string>
     <string name="notification_open_action">Open</string>
