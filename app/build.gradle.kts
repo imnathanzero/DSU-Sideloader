@@ -159,6 +159,8 @@ dependencies {
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:_")
 
     compileOnly(project(":hidden-api-stub"))
+
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks {

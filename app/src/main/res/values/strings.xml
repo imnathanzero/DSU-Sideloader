@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">DSU Sideloader</string>
+    <string name="app_name" translatable="false">Sysphere</string>
+    <string name="app_tagline">Explore beyond your system.</string>
+    <string name="app_pronunciation" translatable="false">Sis-feer</string>
+    <string name="brand_description">Sysphere provides an intuitive, reliable gateway to explore alternative Android system environments using Dynamic System Updates.</string>
+    <string name="original_attribution">Originally created as DSU Sideloader by VegaBobo. Rebranded and enhanced as Sysphere.</string>
 
     <!--
         Home screen
@@ -18,11 +22,11 @@
     <string name="continue_anyway">Continue anyway</string>
 
     <string name="missing_permission">Missing permission</string>
-    <string name="missing_permission_description">DSU Sideloader requires READ_LOGS permission (which allows logcat reading).\nThis permission is used to obtain installation progress and diagnose errors in DSU installation.\n\n** Granting this permission may require a application restart.</string>
+    <string name="missing_permission_description">Sysphere requires READ_LOGS permission (which allows logcat reading).\nThis permission is used to obtain installation progress and diagnose errors in DSU installation.\n\n** Granting this permission may require an application restart.</string>
     <string name="granting_permission">Waiting service to grant permission, please wait…</string>
 
     <string name="unlocked_bl_warn">Unlocked bootloader</string>
-    <string name="unlocked_bl_warn_desc">DSU Sideloader requires unlocked bootloader, installing images with locked bootloader may be dangerous in some devices, before using this app, you: \n- MUST unlock bootloader.\n- MUST have some way to restore device stock firmware.\n- RECOMMENDED to do a full backup.\nThis app have been made to be used by developers and advanced users, you have been warned.</string>
+    <string name="unlocked_bl_warn_desc">Sysphere requires an unlocked bootloader. Installing images with locked bootloader may be dangerous on some devices. Before using this app, you: \n- MUST unlock bootloader.\n- MUST have a way to restore stock firmware.\n- RECOMMENDED to perform a full backup.\nThis app is designed for developers and advanced users. You have been warned.</string>
 
     <!-- Installation card -->
     <string name="select_gsi_info">Select a file to be installed</string>
@@ -130,6 +134,16 @@
 
     <string name="settings">Settings</string>
 
+    <!-- Appearance -->
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="monet_dynamic_color">Dynamic Color (Monet)</string>
+    <string name="monet_dynamic_color_desc">Adapt application surfaces and accents to your system wallpaper</string>
+    <string name="monet_not_supported">Dynamic Color is only available on Android 12 and above</string>
+
     <string name="experimental_feature">Experimental feature</string>
     <string name="experimental_feature_description">This feature is under testing and may be unstable, are you sure?</string>
 
@@ -204,7 +218,7 @@
     <string name="supported">Supported</string>
     <string name="issues_and_feedback">Issues &amp; Feedback</string>
     <string name="issues_and_feedback_desc">Report bugs or request features on GitHub</string>
-    <string name="license_notice">DSU Sideloader is free and open-source software (GPL v3)</string>
+    <string name="license_notice">Sysphere is free and open-source software (GPL v3)</string>
     <string name="check_updates_now">Check now</string>
     <string name="checking_updates">Checking for updates…</string>
     <string name="downloading_update">Downloading update: %1$d%%</string>
@@ -246,6 +260,48 @@
     <string name="installation">Installation</string>
     <string name="discard">Discard</string>
 
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_install">Install</string>
+    <string name="nav_systems">Systems</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Systems Manager -->
+    <string name="systems_manager">Systems Manager</string>
+    <string name="dsu_environment">DSU Environment</string>
+    <string name="guest_system">Guest Dynamic System</string>
+    <string name="host_system">Host System</string>
+    <string name="running_guest_os">Currently running in Dynamic System (GSI)</string>
+    <string name="dsu_installed_ready">Dynamic System installed and ready to boot</string>
+    <string name="no_dsu_installed">No Dynamic System installed</string>
+    <string name="no_dsu_desc">Install a Generic System Image (GSI) to run a secondary Android environment safely without touching your host partitions.</string>
+    <string name="system_actions">System Actions</string>
+    <string name="reboot_to_host">Reboot to Host System</string>
+
+    <!-- Wizard Steps -->
+    <string name="wizard_step_select">1. Select GSI</string>
+    <string name="wizard_step_configure">2. Configure</string>
+    <string name="wizard_step_review">3. Review</string>
+    <string name="wizard_step_progress">4. Progress</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_start_install">Start Installation</string>
+    <string name="summary_target_gsi">Selected GSI</string>
+    <string name="summary_userdata">Allocated Userdata</string>
+    <string name="summary_operation_mode">Operation Mode</string>
+    <string name="summary_ready">All parameters verified. Proceed when ready.</string>
+
+    <!-- Dashboard Quick Actions -->
+    <string name="quick_actions">Quick Actions</string>
+    <string name="system_status">System Status</string>
+    <string name="device_specs">Device Information</string>
+    <string name="action_install_gsi">Install GSI</string>
+    <string name="action_install_gsi_desc">Flash a Generic System Image via DSU</string>
+    <string name="action_manage_systems">Manage Systems</string>
+    <string name="action_manage_systems_desc">Inspect or boot installed DSU partitions</string>
+    <string name="action_diagnostics">Diagnostics</string>
+    <string name="action_diagnostics_desc">View installation and system logs</string>
+
     <string name="close_app">Close app</string>
     <string name="close_app_question">Close app?</string>
 
@@ -276,15 +332,15 @@
     <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
 
     <!-- Live Notification & Alerts -->
-    <string name="notification_channel_name">DSU Installation</string>
+    <string name="notification_channel_name">Sysphere Installation</string>
     <string name="notification_channel_description">Real-time installation progress and status alerts</string>
-    <string name="notification_alerts_channel_name">DSU Alerts</string>
+    <string name="notification_alerts_channel_name">Sysphere Alerts</string>
     <string name="notification_alerts_channel_description">Important alerts when DSU installation completes or fails</string>
-    <string name="notification_installing_title">Installing Dynamic System</string>
+    <string name="notification_installing_title">Sysphere Installation</string>
     <string name="notification_preparing_title">Preparing Dynamic System</string>
     <string name="notification_completed_title">Installation Complete</string>
     <string name="notification_completed_text">Dynamic System is ready. Tap to reboot or restart your device.</string>
-    <string name="notification_failed_title">DSU Installation Failed</string>
+    <string name="notification_failed_title">Installation Failed</string>
     <string name="notification_cancel_action">Cancel</string>
     <string name="notification_reboot_action">Reboot to DSU</string>
     <string name="notification_open_action">Open</string>

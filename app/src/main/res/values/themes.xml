@@ -1,6 +1,6 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.DSUHelper" parent="Theme.Material3.DayNight">
+    <!-- Base application theme: Sysphere -->
+    <style name="Theme.Sysphere" parent="Theme.Material3.DayNight">
 
         <item name="colorPrimary">@color/system_accent</item>
         <item name="colorPrimaryDark">@color/system_accent_darker</item>
@@ -19,6 +19,11 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowSplashScreenBackground">@color/background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
 
     </style>
+
+    <!-- Legacy compatibility alias -->
+    <style name="Theme.DSUHelper" parent="Theme.Sysphere" />
 </resources>
