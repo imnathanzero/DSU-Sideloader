@@ -17,9 +17,13 @@ class DataStoreUtils {
             key: String,
             default: Boolean,
         ): Boolean {
-            return dataStore.data.map {
-                it[booleanPreferencesKey(key)] ?: default
-            }.first()
+            return try {
+                dataStore.data.map {
+                    it[booleanPreferencesKey(key)] ?: default
+                }.first()
+            } catch (e: Exception) {
+                default
+            }
         }
 
         suspend fun readStringPref(
@@ -27,9 +31,13 @@ class DataStoreUtils {
             key: String,
             default: String,
         ): String {
-            return dataStore.data.map {
-                it[stringPreferencesKey(key)] ?: default
-            }.first().toString()
+            return try {
+                dataStore.data.map {
+                    it[stringPreferencesKey(key)] ?: default
+                }.first().toString()
+            } catch (e: Exception) {
+                default
+            }
         }
 
         suspend fun readStringPref(
