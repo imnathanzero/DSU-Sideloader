@@ -30,8 +30,10 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,6 +80,7 @@ import vegabobo.dsusideloader.ui.sdialogs.ConfirmInstallationSheet
 import vegabobo.dsusideloader.ui.sdialogs.DiscardDSUSheet
 import vegabobo.dsusideloader.ui.sdialogs.ViewLogsBottomSheet
 import vegabobo.dsusideloader.ui.util.launcherMultipleAcResult
+import vegabobo.dsusideloader.util.OperationMode
 import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,6 +149,7 @@ fun InstallScreen(
             when (step) {
                 1 -> StepOneSelectGsi(
                     selectedFileName = homeViewModel.obtainSelectedFilename(),
+                    isError = uiState.installationCard.isError,
                     onPickFile = { filePickerLauncher.launch(chooseFile) },
                     onClearFile = { homeViewModel.resetInstallationCard() },
                     onNext = { currentStep = 2 },
@@ -258,6 +262,7 @@ private fun StepIndicatorBar(
 @Composable
 private fun StepOneSelectGsi(
     selectedFileName: String,
+    isError: Boolean,
     onPickFile: () -> Unit,
     onClearFile: () -> Unit,
     onNext: () -> Unit,
@@ -304,6 +309,34 @@ private fun StepOneSelectGsi(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if (isError) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.WarningAmber,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.file_unsupported),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                            )
+                        }
+                    }
+                }
 
                 if (selectedFileName.isEmpty()) {
                     PrimaryButton(
@@ -390,6 +423,47 @@ private fun StepTwoConfigure(
             onCheckedChange = { homeViewModel.onCheckUserdataCard() },
             onPreserveCheckedChange = { homeViewModel.onCheckPreserveUserdata(it) },
         )
+
+        // Operation Mode Details Card
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Security,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Operation Mode: ${homeViewModel.session.getOperationMode().name}",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = when (homeViewModel.session.getOperationMode()) {
+                            OperationMode.ROOT, OperationMode.SYSTEM_AND_ROOT ->
+                                "Direct installation via native GsiService APIs (Built-in installer)"
+                            OperationMode.SHIZUKU ->
+                                "Privileged installation via DSU VerificationActivity with live logcat tracking"
+                            OperationMode.SYSTEM ->
+                                "System privileged mode"
+                            OperationMode.ADB ->
+                                "Script generation mode for ADB execution on PC or terminal"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
