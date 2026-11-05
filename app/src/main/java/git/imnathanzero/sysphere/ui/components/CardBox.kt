@@ -1,6 +1,7 @@
 package git.imnathanzero.sysphere.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -49,7 +50,13 @@ fun CardBox(
         Column(modifier = modifier) {
             if (cardTitle.isNotEmpty()) {
                 if (addToggle) {
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable(enabled = isToggleEnabled) { onCheckedChange(!isToggleChecked) },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         CardTitle(modifier.weight(1F), cardTitle = cardTitle)
                         Spacer(modifier = Modifier.padding(4.dp))
                         Switch(

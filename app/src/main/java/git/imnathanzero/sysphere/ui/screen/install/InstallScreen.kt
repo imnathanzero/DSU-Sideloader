@@ -416,7 +416,7 @@ private fun StepTwoConfigure(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         UserdataCard(
-            isEnabled = true,
+            isEnabled = !uiState.isInstalling(),
             uiState = uiState.userDataCard,
             isDsuInstalled = uiState.isDsuInstalled,
             onValueChange = { homeViewModel.updateUserdataSize(it) },

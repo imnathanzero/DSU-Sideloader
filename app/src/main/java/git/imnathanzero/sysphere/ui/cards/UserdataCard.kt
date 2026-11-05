@@ -42,7 +42,7 @@ import git.imnathanzero.sysphere.ui.screen.home.UserDataCardState
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UserdataCard(
-    isEnabled: Boolean,
+    isEnabled: Boolean = true,
     uiState: UserDataCardState,
     isDsuInstalled: Boolean = false,
     modifier: Modifier = Modifier,
@@ -52,7 +52,7 @@ fun UserdataCard(
 ) {
     val quickPresets = listOf("2", "4", "8", "16", "32")
 
-    if (isDsuInstalled && !isEnabled) {
+    if (isDsuInstalled && isEnabled) {
         CardBox(
             modifier = modifier,
             cardTitle = stringResource(id = R.string.userdata_size),
@@ -65,7 +65,7 @@ fun UserdataCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable(enabled = !isEnabled) { onPreserveCheckedChange(!uiState.preserveSelected) }
+                        .clickable(enabled = isEnabled) { onPreserveCheckedChange(!uiState.preserveSelected) }
                         .padding(vertical = 8.dp),
                 ) {
                     Box(
@@ -102,7 +102,7 @@ fun UserdataCard(
 
                     Switch(
                         checked = uiState.preserveSelected,
-                        enabled = !isEnabled,
+                        enabled = isEnabled,
                         onCheckedChange = { onPreserveCheckedChange(!uiState.preserveSelected) },
                     )
                 }
@@ -111,7 +111,7 @@ fun UserdataCard(
                     Column(modifier = Modifier.padding(top = 8.dp)) {
                         FileSelectionBox(
                             modifier = Modifier.padding(bottom = 6.dp),
-                            isEnabled = !isEnabled,
+                            isEnabled = isEnabled,
                             isError = uiState.isError,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             textFieldValue = uiState.text,
@@ -132,7 +132,7 @@ fun UserdataCard(
                                     } else {
                                         MaterialTheme.colorScheme.surfaceContainerHighest
                                     },
-                                    modifier = Modifier.clickable(enabled = !isEnabled) {
+                                    modifier = Modifier.clickable(enabled = isEnabled) {
                                         onValueChange(preset)
                                     },
                                 ) {
@@ -182,10 +182,18 @@ fun UserdataCard(
             modifier = modifier,
             cardTitle = stringResource(id = R.string.userdata_size),
             addToggle = true,
-            isToggleEnabled = !isEnabled,
+            isToggleEnabled = isEnabled,
             isToggleChecked = uiState.isSelected,
             onCheckedChange = onCheckedChange,
         ) {
+            if (!uiState.isSelected) {
+                Text(
+                    text = "Default allocation (tap to customize)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                )
+            }
             AnimatedVisibility(
                 visible = uiState.isSelected,
                 enter = expandVertically(),
@@ -194,7 +202,7 @@ fun UserdataCard(
                 Column {
                     FileSelectionBox(
                         modifier = Modifier.padding(bottom = 6.dp),
-                        isEnabled = !isEnabled,
+                        isEnabled = isEnabled,
                         isError = uiState.isError,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         textFieldValue = uiState.text,
@@ -215,7 +223,7 @@ fun UserdataCard(
                                 } else {
                                     MaterialTheme.colorScheme.surfaceContainerHighest
                                 },
-                                modifier = Modifier.clickable(enabled = !isEnabled) {
+                                modifier = Modifier.clickable(enabled = isEnabled) {
                                     onValueChange(preset)
                                 },
                             ) {
