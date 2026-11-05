@@ -8,20 +8,21 @@ fun getReleaseSigningConfig(): File {
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     id("com.mikepenz.aboutlibraries.plugin")
     id("kotlinx-serialization")
     id("org.jmailen.kotlinter")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
-    val versionCode: Int by rootProject.extra
-    val versionName: String by rootProject.extra
-    val packageName: String by rootProject.extra
+    val versionCode = rootProject.extra["versionCode"] as Int
+    val versionName = rootProject.extra["versionName"] as String
+    val packageName = rootProject.extra["packageName"] as String
 
     namespace = packageName
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         this.applicationId = packageName
@@ -29,7 +30,7 @@ android {
         this.versionName = versionName
 
         minSdk = 29
-        targetSdk = 33
+        targetSdk = 35
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -88,22 +89,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(21)
     }
     buildFeatures {
         aidl = true
         buildConfig = true
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
     }
     packaging {
         resources {
@@ -142,7 +140,7 @@ dependencies {
 
     implementation(Google.dagger.hilt.android)
     implementation(AndroidX.hilt.navigationCompose)
-    kapt(Google.dagger.hilt.compiler)
+    ksp(Google.dagger.hilt.compiler)
 
     implementation(Google.android.material)
     implementation(KotlinX.serialization.json)

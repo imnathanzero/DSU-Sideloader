@@ -9,8 +9,8 @@ tasks.register<Zip>("assembleMagiskModule") {
     val description = "System mode for DSU Sideloader"
     val updateJson = "https://raw.githubusercontent.com/VegaBobo/DSU-Sideloader/master/other/module_updater/updater_module_gsid.json"
 
-    val versionCode: Int by rootProject.extra
-    val versionName: String by rootProject.extra
+    val versionCode = rootProject.extra["versionCode"] as Int
+    val versionName = rootProject.extra["versionName"] as String
     val workDirectory = "${System.getProperty("user.dir")}/${project.name}"
     val moduleDirectory = "$workDirectory/src/main/resources/module"
     val outDirectory = "$workDirectory/out"
