@@ -29,7 +29,7 @@ import rikka.shizuku.ShizukuProvider
  *  - Supports built-in DSU installer
  *  - Enhanced DSU installation diagnostics
  *
- * System mode: When running as system-app (eg: when using our Magisk module)
+ * System mode: When running as system-app (eg: installed as privileged system app)
  * Features:
  *  - All features presents when using Shizuku mode
  *  - Custom gsid binary when available

@@ -61,11 +61,10 @@ DSU Sideloader support multiple operation modes, they will define how our app wi
 - All features avaiable in Shizuku, however, does not require any special permissions
 - DynamicSystem API features (check if DSU is installed, reboot to DSU, discard..., everthing directly from app)
 - Support built-in DSU installer ⁴ ⁵
-4. System mode: When running as system-app (Obtained by installing our Magisk module)
+4. System mode: When running as system-app (installed in `/system/priv-app`)
 - All features avaiable in Shizuku
 - Fixes for some common gsi/dsu-related SELinux denials
-- Custom gsid binary (can fix some installation errors in some devices ⁵ ⁶
-5. System/Root mode: When running as system-app with granted root permission (Obtained by installing our Magisk module and granting root permission)
+5. System/Root mode: When running as system-app with granted root permission
 - All features available in root and system operation mode
 
 ¹ Requires READ_LOGS permission.
@@ -77,8 +76,6 @@ DSU Sideloader support multiple operation modes, they will define how our app wi
 ⁴ Feature not supported on Android 10.
 <br>
 ⁵ Experimental feature, built-in installer code is [here](https://github.com/VegaBobo/DSU-Sideloader/blob/master/app/src/main/java/vegabobo/dsusideloader/installer/root/DSUInstaller.kt).
-<br>
-⁶ Module including custom gsid binary is optional, changes made to AOSP gsid binary can be found [here](https://github.com/VegaBobo/DSU-Sideloader/tree/master/magisk-module/src/main/resources/aosp_patches).
 
 #### Recomendations
 
@@ -93,7 +90,7 @@ DSU Sideloader support multiple operation modes, they will define how our app wi
 1. DSU installation finishes with no errors, but device doesn't boot into installed DSU, what should i do?
 - It is likely that AVB is preventing device from booting installed images, try flashing disabled vbmeta, check [this](https://developer.android.com/topic/generic-system-image#flash-gsi) for more info.
 2. Why isn't possible to set a high userdata value?
-- The more storage you have free, the more you can use to be your userdata, some Android versions limit the maximum allowed for allocation (this limitation is 40%, and is not our app limitation, it is a thing from Android itself, you can use our custom gsid binary, which reduces this limitation to 20%, is possible to eliminate it, but no clue if there is some implications, so, i just decided to decrease it).
+- The more storage you have free, the more you can use to be your userdata, some Android versions limit the maximum allowed for allocation (this limitation is 40%, and is not our app limitation, it is a thing from Android itself).
 3. Why "Unmount SD" option exists?
 - If available, DSU priorizes allocation in sdcard, but allocating in sdcard is not supported in some cases (it may depends on filesystem present on sd, and if the allocation in SD is allowed by OS itself), since allocating in SD may cause installation errors in some devices, that options is here to enforce allocation in device storage.
 4. Why built-in installer requires root?
