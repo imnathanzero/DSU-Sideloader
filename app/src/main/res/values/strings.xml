@@ -330,7 +330,6 @@
     <string name="refresh">Refresh</string>
     <string name="kernel_no_loop_warning">Your kernel lacks loop device support (CONFIG_BLK_DEV_LOOP). Mounting raw partition images may fail unless you use a kernel with loop support.</string>
     <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
-
     <!-- Live Notification & Alerts -->
     <string name="notification_channel_name">Sysphere Installation</string>
     <string name="notification_channel_description">Real-time installation progress and status alerts</string>
@@ -348,4 +347,11 @@
     <string name="live_alert_banner_ready">Dynamic System ready to boot</string>
     <string name="live_alert_banner_tap_to_view">Tap to view installation</string>
     <string name="live_alert_banner_failed">Installation encountered an error</string>
+
+    <string name="override_partition">Override partition</string>
+    <string name="override_partition_desc">Select a replacement image (.img) to overwrite %1$s. All current data in this partition will be replaced.</string>
+    <string name="override">Override</string>
+    <string name="select_image_file">Select image file</string>
+    <string name="override_partition_name">Override partition name</string>
+    <string name="override_partition_name_desc">Change target partition name for this image</string>
 </resources>

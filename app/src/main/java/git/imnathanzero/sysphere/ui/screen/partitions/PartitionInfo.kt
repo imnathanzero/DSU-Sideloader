@@ -10,6 +10,9 @@ data class PartitionInfo(
     val mountPoint: String = "",
     val filesystem: String = "",
     val isReadOnly: Boolean = true,
+    val dsuPrefix: String = "",
+    val dsuImageName: String = "",
+    val mappedDevice: String = "",
 ) {
     val formattedSize: String
         get() {

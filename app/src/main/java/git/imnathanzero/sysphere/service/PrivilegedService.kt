@@ -269,4 +269,100 @@ class PrivilegedService : IPrivilegedService.Stub() {
         requiresDynamicSystem()
         return DYNAMIC_SYSTEM!!.isInstalled
     }
+
+    //
+    // GSI Service & Backing Image Manager (gsid)
+    //
+
+    private var GSI_SERVICE: IGsiService? = null
+
+    private fun getBinderOrNull(service: String): IBinder? {
+        return runCatching { getBinder(service) }.getOrNull()
+    }
+
+    private fun requiresGsiService(): IGsiService {
+        GSI_SERVICE?.let { return it }
+        val binder = getBinderOrNull("gsiservice")
+            ?: run {
+                setProp("ctl.start", "gsid")
+                val deadline = System.currentTimeMillis() + 10_000L
+                var found: IBinder? = null
+                while (System.currentTimeMillis() < deadline && found == null) {
+                    Thread.sleep(100L)
+                    found = getBinderOrNull("gsiservice")
+                }
+                found ?: throw IllegalStateException("gsiservice is unavailable")
+            }
+        return IGsiService.Stub.asInterface(binder).also { GSI_SERVICE = it }
+    }
+
+    override fun getImagePrefixes(): List<String> {
+        val gsi = runCatching { requiresGsiService() }.getOrNull() ?: return listOf("dsu/dsu/", "dsu/")
+        val prefixes = mutableListOf<String>()
+        runCatching { gsi.installedDsuSlots }.getOrDefault(emptyList()).forEach { slot ->
+            prefixes.add("$slot/$slot/")
+            prefixes.add("$slot/")
+        }
+        runCatching { gsi.activeDsuSlot?.takeIf { it.isNotEmpty() } }.getOrNull()?.let { slot ->
+            prefixes.add("$slot/$slot/")
+            prefixes.add("$slot/")
+        }
+        runCatching { gsi.installedGsiImageDir.orEmpty() }.getOrNull()
+            ?.removePrefix("/data/gsi/")
+            ?.trim('/')
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { prefixes.add("$it/") }
+        prefixes.add("dsu/dsu/")
+        prefixes.add("dsu/")
+        return prefixes.distinct()
+    }
+
+    override fun getDsuImages(prefix: String?): List<String> {
+        if (prefix.isNullOrEmpty()) return emptyList()
+        val gsi = runCatching { requiresGsiService() }.getOrNull() ?: return emptyList()
+        return runCatching { gsi.openImageService(prefix).allBackingImages }.getOrDefault(emptyList())
+    }
+
+    override fun mapDsuImage(prefix: String?, imageName: String?): String? {
+        if (prefix.isNullOrEmpty() || imageName.isNullOrEmpty()) return null
+        return try {
+            val gsi = requiresGsiService()
+            val imageService = gsi.openImageService(prefix)
+            if (imageService.isImageMapped(imageName)) {
+                imageService.unmapImageDevice(imageName)
+            }
+            val mappedImage = android.gsi.MappedImage()
+            imageService.mapImageDevice(imageName, 5000, mappedImage)
+            mappedImage.path
+        } catch (e: Exception) {
+            Log.e(BuildConfig.APPLICATION_ID, "Failed to map image $imageName in $prefix", e)
+            null
+        }
+    }
+
+    override fun unmapDsuImage(prefix: String?, imageName: String?): Boolean {
+        if (prefix.isNullOrEmpty() || imageName.isNullOrEmpty()) return false
+        return try {
+            val gsi = requiresGsiService()
+            val imageService = gsi.openImageService(prefix)
+            if (imageService.isImageMapped(imageName)) {
+                imageService.unmapImageDevice(imageName)
+            }
+            true
+        } catch (e: Exception) {
+            Log.e(BuildConfig.APPLICATION_ID, "Failed to unmap image $imageName in $prefix", e)
+            false
+        }
+    }
+
+    override fun isDsuImageMapped(prefix: String?, imageName: String?): Boolean {
+        if (prefix.isNullOrEmpty() || imageName.isNullOrEmpty()) return false
+        return try {
+            val gsi = requiresGsiService()
+            val imageService = gsi.openImageService(prefix)
+            imageService.isImageMapped(imageName)
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

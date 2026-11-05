@@ -1,6 +1,10 @@
 package git.imnathanzero.sysphere.ui.screen.partitions
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,8 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Refresh
@@ -32,6 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +61,7 @@ import git.imnathanzero.sysphere.ui.components.TopBar
 import git.imnathanzero.sysphere.ui.components.buttons.PrimaryButton
 import git.imnathanzero.sysphere.ui.components.buttons.SecondaryButton
 import git.imnathanzero.sysphere.ui.screen.Destinations
+import git.imnathanzero.sysphere.util.FilenameUtils
 import git.imnathanzero.sysphere.util.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -425,6 +434,18 @@ fun PartitionsScreen(
                                     modifier = Modifier.size(20.dp),
                                 )
                             }
+                            Spacer(modifier = Modifier.size(4.dp))
+                            IconButton(
+                                onClick = { viewModel.promptOverridePartition(partition) },
+                                modifier = Modifier.size(36.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = stringResource(id = R.string.override_partition),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         if (partition.isMounted) {
@@ -449,6 +470,92 @@ fun PartitionsScreen(
         }
     }
 
+    // Override confirmation / selection dialog
+    uiState.partitionToOverride?.let { partition ->
+        var selectedUri by remember { mutableStateOf<Uri?>(null) }
+        var selectedFileName by remember { mutableStateOf("") }
+
+        val chooseFileIntent = remember {
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }
+        }
+
+        val launcherFile = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            val uri = result.data?.data
+            if (uri != null) {
+                selectedUri = uri
+                selectedFileName = FilenameUtils.queryName(context.contentResolver, uri)
+            }
+        }
+
+        Dialog(
+            icon = Icons.Outlined.Edit,
+            title = stringResource(id = R.string.override_partition),
+            text = stringResource(id = R.string.override_partition_desc, partition.name),
+            confirmText = stringResource(id = R.string.override),
+            cancelText = stringResource(id = R.string.cancel),
+            isConfirmEnabled = selectedUri != null,
+            onClickConfirm = {
+                selectedUri?.let { uri ->
+                    viewModel.overridePartition(partition, uri)
+                }
+            },
+            onClickCancel = { viewModel.dismissOverridePrompt() },
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .clickable { launcherFile.launch(chooseFileIntent) }
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FolderOpen,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(modifier = Modifier.size(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (selectedFileName.isNotEmpty()) {
+                                selectedFileName
+                            } else {
+                                stringResource(id = R.string.select_image_file)
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (selectedFileName.isNotEmpty()) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedFileName.isNotEmpty()) {
+                                MaterialTheme.colorScheme.onSurface
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                            maxLines = 1,
+                        )
+                        if (selectedFileName.isNotEmpty()) {
+                            Text(
+                                text = stringResource(id = R.string.selected_file),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Delete confirmation dialog
     uiState.partitionToDelete?.let { partition ->
         Dialog(
@@ -459,6 +566,17 @@ fun PartitionsScreen(
             cancelText = stringResource(id = R.string.cancel),
             onClickConfirm = { viewModel.confirmDeletePartition() },
             onClickCancel = { viewModel.dismissDeletePrompt() },
+        )
+    }
+
+    // Success message dialog
+    if (uiState.successMessage.isNotEmpty()) {
+        Dialog(
+            icon = Icons.Outlined.CheckCircle,
+            title = stringResource(id = R.string.override),
+            text = uiState.successMessage,
+            confirmText = stringResource(id = R.string.ok),
+            onClickConfirm = { viewModel.clearSuccessMessage() },
         )
     }
 

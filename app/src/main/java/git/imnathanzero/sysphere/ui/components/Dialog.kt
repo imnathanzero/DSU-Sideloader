@@ -26,6 +26,7 @@ fun Dialog(
     cancelText: String = "",
     onClickConfirm: () -> Unit = {},
     onClickCancel: () -> Unit = {},
+    isConfirmEnabled: Boolean = true,
     content: @Composable () -> Unit = {},
 ) {
     AlertDialog(
@@ -34,7 +35,10 @@ fun Dialog(
         onDismissRequest = onClickCancel,
         confirmButton = {
             if (confirmText.isNotEmpty()) {
-                TextButton(onClick = onClickConfirm) {
+                TextButton(
+                    onClick = onClickConfirm,
+                    enabled = isConfirmEnabled,
+                ) {
                     Text(text = confirmText)
                 }
             }
