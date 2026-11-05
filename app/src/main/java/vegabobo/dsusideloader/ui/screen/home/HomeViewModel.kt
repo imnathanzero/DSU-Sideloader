@@ -27,6 +27,7 @@ import vegabobo.dsusideloader.installer.privileged.DsuInstallationHandler
 import vegabobo.dsusideloader.installer.privileged.LogcatDiagnostic
 import vegabobo.dsusideloader.installer.root.DSUInstaller
 import vegabobo.dsusideloader.model.DSUInstallationSource
+import vegabobo.dsusideloader.model.SelectedImageFile
 import vegabobo.dsusideloader.model.Session
 import vegabobo.dsusideloader.preferences.AppPrefs
 import vegabobo.dsusideloader.preparation.InstallationStep
@@ -85,13 +86,17 @@ class HomeViewModel @Inject constructor(
     private fun updateSheetState(sheetDisplay: SheetDisplayState) =
         _uiState.update { it.copy(sheetDisplay = sheetDisplay) }
 
-    fun resetInstallationCard() =
+    fun resetInstallationCard() {
+        session.userSelection.selectedFiles.clear()
+        session.userSelection.selectedFileName = ""
+        session.userSelection.selectedFileUri = Uri.EMPTY
         _uiState.update {
             it.copy(
                 installationCard = InstallationCardState(),
                 sheetDisplay = SheetDisplayState.NONE,
             )
         }
+    }
 
     fun dismissSheet() = updateSheetState(SheetDisplayState.NONE)
 
@@ -453,18 +458,38 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onFileSelectionResult(uri: Uri) {
-        val filename = FilenameUtils.queryName(application.contentResolver, uri)
-        val extension = filename.substringAfterLast(".", "")
-        val supportedFiles = arrayListOf("gz", "xz", "img", "gzip")
+        onFilesSelectionResult(listOf(uri))
+    }
 
-        // DSU packages (zip files), are only supported in R+
+    fun onFilesSelectionResult(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+
+        val supportedFiles = arrayListOf("gz", "xz", "img", "gzip")
         if (Build.VERSION.SDK_INT > 29) {
             supportedFiles.add("zip")
         }
-        val isFileSupported = supportedFiles.contains(extension)
-        Log.d(tag, "isFileSupported: $isFileSupported, extension: $extension, filename: $filename")
 
-        if (!isFileSupported) {
+        val validFiles = mutableListOf<SelectedImageFile>()
+        for (uri in uris) {
+            val filename = FilenameUtils.queryName(application.contentResolver, uri)
+            val extension = filename.substringAfterLast(".", "").lowercase()
+            if (!supportedFiles.contains(extension)) {
+                Log.d(tag, "Unsupported extension: $extension for file: $filename")
+                continue
+            }
+            val partitionName = FilenameUtils.extractPartitionName(filename)
+            val fileSize = storageManager.getFilesizeFromUri(uri)
+            validFiles.add(
+                SelectedImageFile(
+                    uri = uri,
+                    name = filename,
+                    partitionName = partitionName,
+                    fileSize = fileSize,
+                ),
+            )
+        }
+
+        if (validFiles.isEmpty()) {
             viewModelScope.launch {
                 updateInstallationCard { it.copy(isError = true, isTextFieldEnabled = false) }
                 delay(2000)
@@ -473,14 +498,29 @@ class HomeViewModel @Inject constructor(
             return
         }
 
-        session.userSelection.selectedFileName = filename
-        session.userSelection.selectedFileUri = uri
-        updateInstallationCard {
-            it.copy(
-                text = filename,
-                isTextFieldEnabled = false,
-                isInstallable = true,
-            )
+        session.userSelection.selectedFiles = validFiles
+        session.userSelection.selectedFileUri = validFiles.first().uri
+        if (validFiles.size == 1) {
+            session.userSelection.selectedFileName = validFiles.first().name
+            updateInstallationCard {
+                it.copy(
+                    text = validFiles.first().name,
+                    isTextFieldEnabled = false,
+                    isInstallable = true,
+                    selectedFiles = validFiles,
+                )
+            }
+        } else {
+            val summary = "${validFiles.size} images: " + validFiles.joinToString(", ") { it.name }
+            session.userSelection.selectedFileName = summary
+            updateInstallationCard {
+                it.copy(
+                    text = "${validFiles.size} images (${validFiles.joinToString(", ") { it.partitionName }})",
+                    isTextFieldEnabled = false,
+                    isInstallable = true,
+                    selectedFiles = validFiles,
+                )
+            }
         }
     }
 

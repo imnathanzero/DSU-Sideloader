@@ -63,5 +63,22 @@ class FilenameUtils {
         fun getLengthFromFile(context: Context, uri: Uri): Long {
             return DocumentFile.fromSingleUri(context, uri)!!.length()
         }
+
+        fun extractPartitionName(filename: String): String {
+            val lower = filename.lowercase()
+            val nameWithoutExt = lower
+                .substringBeforeLast(".img")
+                .substringBeforeLast(".xz")
+                .substringBeforeLast(".gz")
+                .substringBeforeLast(".")
+            return when {
+                nameWithoutExt.contains("system_ext") -> "system_ext"
+                nameWithoutExt.contains("product") -> "product"
+                nameWithoutExt.contains("vendor") -> "vendor"
+                nameWithoutExt.contains("odm") -> "odm"
+                nameWithoutExt.contains("system") -> "system"
+                else -> nameWithoutExt.replace(Regex("[^a-zA-Z0-9_-]"), "_")
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package vegabobo.dsusideloader.ui.screen.home
 
+import vegabobo.dsusideloader.model.SelectedImageFile
 import vegabobo.dsusideloader.preparation.InstallationStep
 
 data class InstallationCardState(
@@ -12,6 +13,7 @@ data class InstallationCardState(
     val isProgressBarIndeterminate: Boolean = false,
     val installationProgress: Float = 0F,
     val currentPartitionText: String = "",
+    val selectedFiles: List<SelectedImageFile> = emptyList(),
 )
 
 data class UserDataCardState(

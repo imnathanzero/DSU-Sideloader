@@ -106,9 +106,11 @@
     <string name="cancel_installation_description">All progress made will be lost, are you sure?</string>
 
     <!-- Installation finished card -->
-    <string name="installation_finished_rootless">Image installed successfully, check your notifications to boot into dynamic system.</string>
-    <string name="installation_finished">Installation finished.</string>
+    <string name="installation_finished_rootless">Installation finished! A device restart is required to boot into the dynamic system. Please restart your device or tap the system notification.</string>
+    <string name="installation_finished">Installation finished! A device restart is required to boot into the dynamic system. Please reboot your device now.</string>
     <string name="reboot_into_dsu">Reboot into DSU</string>
+    <string name="reboot_required">Reboot required</string>
+    <string name="reboot_after_install_info">Device must be restarted after processing to boot into dynamic system</string>
 
     <!-- Userdata card -->
     <string name="userdata_size">Userdata size</string>
@@ -247,6 +249,8 @@
     <string name="partitions_manager">Partition Manager</string>
     <string name="partitions_manager_desc">Manage and mount installed DSU partitions</string>
     <string name="mount_output_path">Mount output: /data/local/DSUMounts</string>
+    <string name="mount_target">Mount target</string>
+    <string name="status">Status</string>
     <string name="no_partitions_found">No installed partitions found</string>
     <string name="no_partitions_desc">DSU partitions will appear here when an installation is active or present in /data/gsi</string>
     <string name="mount">Mount</string>
@@ -267,4 +271,5 @@
     <string name="copy_mount_path">Copy path</string>
     <string name="mount_path_copied">Mount path copied to clipboard</string>
     <string name="refresh">Refresh</string>
+    <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
 </resources>

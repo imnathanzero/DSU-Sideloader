@@ -1,5 +1,6 @@
 package vegabobo.dsusideloader.ui.screen.partitions
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -18,8 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,14 +51,15 @@ import vegabobo.dsusideloader.R
 import vegabobo.dsusideloader.ui.components.AppBottomBar
 import vegabobo.dsusideloader.ui.components.ApplicationScreen
 import vegabobo.dsusideloader.ui.components.Dialog
+import vegabobo.dsusideloader.ui.components.PreferenceItem
 import vegabobo.dsusideloader.ui.components.SimpleCard
 import vegabobo.dsusideloader.ui.components.Title
 import vegabobo.dsusideloader.ui.components.TopBar
-import vegabobo.dsusideloader.ui.components.buttons.ActionButton
-import vegabobo.dsusideloader.ui.components.buttons.ErrorButton
 import vegabobo.dsusideloader.ui.components.buttons.PrimaryButton
 import vegabobo.dsusideloader.ui.components.buttons.SecondaryButton
 import vegabobo.dsusideloader.ui.screen.Destinations
+import vegabobo.dsusideloader.ui.util.launcherAcResult
+import vegabobo.dsusideloader.util.FilenameUtils
 import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +73,8 @@ fun PartitionsScreen(
     val clipboardManager = LocalClipboardManager.current
 
     ApplicationScreen(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.partitions_manager),
@@ -105,26 +111,42 @@ fun PartitionsScreen(
             return@ApplicationScreen
         }
 
-        // Overview / Controls Card
+        // Overview / Mount Target Card
         SimpleCard {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Folder,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.size(12.dp))
+
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(id = R.string.partitions_manager),
+                            text = stringResource(id = R.string.mount_target),
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = stringResource(id = R.string.mount_output_path),
+                            text = PartitionsViewModel.MOUNT_BASE_PATH,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+
                     IconButton(onClick = { viewModel.scanPartitions() }) {
                         Icon(
                             imageVector = Icons.Outlined.Refresh,
@@ -133,30 +155,74 @@ fun PartitionsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 val mountedCount = uiState.partitions.count { it.isMounted }
-                Text(
-                    text = "$mountedCount / ${uiState.partitions.size} ${stringResource(id = R.string.mounted).lowercase()}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.status),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = "$mountedCount / ${uiState.partitions.size} ${stringResource(id = R.string.mounted).lowercase()}",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (mountedCount > 0) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     PrimaryButton(
+                        modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.mount_all),
                         onClick = { viewModel.mountAll() },
                         isEnabled = uiState.partitions.any { !it.isMounted },
                     )
                     SecondaryButton(
+                        modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.unmount_all),
                         onClick = { viewModel.unmountAll() },
                         isEnabled = uiState.partitions.any { it.isMounted },
+                    )
+                }
+            }
+        }
+
+        if (uiState.partitions.isNotEmpty()) {
+            SimpleCard {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(4.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.RestartAlt,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(modifier = Modifier.size(12.dp))
+                    Text(
+                        text = stringResource(id = R.string.partitions_reboot_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -245,7 +311,11 @@ fun PartitionsScreen(
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                text = "${partition.formattedSize} • ${partition.path}",
+                                text = if (partition.formattedSize.isNotEmpty()) {
+                                    "${partition.formattedSize} • ${partition.path.substringAfterLast("/")}"
+                                } else {
+                                    partition.path.substringAfterLast("/")
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1,
@@ -271,6 +341,7 @@ fun PartitionsScreen(
                                     stringResource(id = R.string.unmounted)
                                 },
                                 style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Medium,
                                 color = if (partition.isMounted) {
                                     MaterialTheme.colorScheme.onPrimaryContainer
                                 } else {
@@ -280,8 +351,16 @@ fun PartitionsScreen(
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = partition.path,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                    )
+
                     if (partition.isMounted) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -289,15 +368,13 @@ fun PartitionsScreen(
                                 .background(MaterialTheme.colorScheme.surfaceContainerLow)
                                 .clickable {
                                     clipboardManager.setText(AnnotatedString(partition.mountPoint))
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            context.getString(R.string.mount_path_copied),
-                                            Toast.LENGTH_SHORT,
-                                        )
-                                        .show()
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.mount_path_copied),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
                                 }
-                                .padding(8.dp),
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
@@ -305,11 +382,12 @@ fun PartitionsScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.weight(1f),
+                                maxLines = 1,
                             )
                             Icon(
                                 imageVector = Icons.Outlined.ContentCopy,
                                 contentDescription = stringResource(id = R.string.copy_mount_path),
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -319,27 +397,36 @@ fun PartitionsScreen(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (!partition.isMounted) {
+                            IconButton(
+                                onClick = { viewModel.promptDeletePartition(partition) },
+                                modifier = Modifier.size(36.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = stringResource(id = R.string.discard),
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
                         if (partition.isMounted) {
                             SecondaryButton(
                                 text = stringResource(id = R.string.unmount),
                                 onClick = { viewModel.unmountPartition(partition) },
                             )
                         } else {
-                            ActionButton(
-                                text = stringResource(id = R.string.mount_ro),
-                                onClick = { viewModel.mountPartition(partition, readOnly = true) },
-                            )
-                            Spacer(modifier = Modifier.size(8.dp))
-                            ActionButton(
+                            SecondaryButton(
                                 text = stringResource(id = R.string.mount_rw),
                                 onClick = { viewModel.mountPartition(partition, readOnly = false) },
                             )
                             Spacer(modifier = Modifier.size(8.dp))
-                            ErrorButton(
-                                text = stringResource(id = R.string.discard),
-                                onClick = { viewModel.promptDeletePartition(partition) },
+                            PrimaryButton(
+                                text = stringResource(id = R.string.mount),
+                                onClick = { viewModel.mountPartition(partition, readOnly = true) },
                             )
                         }
                     }
@@ -348,26 +435,12 @@ fun PartitionsScreen(
         }
 
         // Custom mount option
-        Title(title = stringResource(id = R.string.mount_custom_image))
-        SimpleCard {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(id = R.string.mount_custom_image),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = stringResource(id = R.string.mount_custom_image_desc),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                PrimaryButton(
-                    text = stringResource(id = R.string.mount_custom_image),
-                    onClick = { viewModel.setShowCustomMountDialog(true) },
-                )
-            }
-        }
+        Title(title = stringResource(id = R.string.other))
+        PreferenceItem(
+            title = stringResource(id = R.string.mount_custom_image),
+            description = stringResource(id = R.string.mount_custom_image_desc),
+            onClick = { viewModel.setShowCustomMountDialog(true) },
+        )
     }
 
     // Custom mount dialog
@@ -375,6 +448,21 @@ fun PartitionsScreen(
         var customPath by remember { mutableStateOf("") }
         var customName by remember { mutableStateOf("") }
         var readOnly by remember { mutableStateOf(true) }
+
+        val chooseCustomFile = remember {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.type = "*/*"
+            Intent.createChooser(intent, "")
+        }
+
+        val launcherCustomFile = launcherAcResult { uri ->
+            val realPath = FilenameUtils.getFilePath(uri, false).replace("file://", "")
+            val filename = FilenameUtils.queryName(context.contentResolver, uri)
+            customPath = realPath
+            if (customName.isEmpty()) {
+                customName = FilenameUtils.extractPartitionName(filename)
+            }
+        }
 
         Dialog(
             icon = Icons.Outlined.FolderOpen,
@@ -392,6 +480,14 @@ fun PartitionsScreen(
                     onValueChange = { customPath = it },
                     label = { Text(stringResource(id = R.string.image_path)) },
                     placeholder = { Text("/data/gsi/dsu/system_gsi.img") },
+                    trailingIcon = {
+                        IconButton(onClick = { launcherCustomFile.launch(chooseCustomFile) }) {
+                            Icon(
+                                imageVector = Icons.Outlined.FolderOpen,
+                                contentDescription = null,
+                            )
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     singleLine = true,

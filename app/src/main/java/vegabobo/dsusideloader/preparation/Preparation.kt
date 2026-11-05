@@ -1,11 +1,16 @@
 package vegabobo.dsusideloader.preparation
 
 import android.net.Uri
+import java.io.BufferedOutputStream
 import java.math.BigInteger
+import java.util.zip.Deflater
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.Job
 import vegabobo.dsusideloader.core.StorageManager
 import vegabobo.dsusideloader.model.DSUConstants
 import vegabobo.dsusideloader.model.DSUInstallationSource
+import vegabobo.dsusideloader.model.ImagePartition
 import vegabobo.dsusideloader.model.Session
 
 class Preparation(
@@ -22,11 +27,99 @@ class Preparation(
     private val userSelectedFileUri = session.userSelection.selectedFileUri
 
     override fun invoke() {
+        if (session.userSelection.isMultipleFiles()) {
+            prepareMultipleImages()
+            return
+        }
         if (session.preferences.useBuiltinInstaller && session.isRoot()) {
             prepareRooted()
             return
         }
         prepareForDSU()
+    }
+
+    private fun prepareMultipleImages() {
+        storageManager.cleanWorkspaceFolder(true)
+        val files = session.userSelection.selectedFiles
+
+        if (session.isRoot()) {
+            val images = mutableListOf<ImagePartition>()
+            for (file in files) {
+                val ext = getExtension(file.uri)
+                var finalUri = file.uri
+                var fileSize = file.fileSize
+                if (ext == "xz" || ext == "gz" || ext == "gzip") {
+                    val extracted = extractFile(file.uri, file.partitionName)
+                    finalUri = extracted.first
+                    fileSize = extracted.second
+                } else if (fileSize <= 0L) {
+                    fileSize = storageManager.getFilesizeFromUri(file.uri)
+                }
+                images.add(
+                    ImagePartition(
+                        partitionName = file.partitionName,
+                        uri = finalUri,
+                        fileSize = fileSize,
+                    ),
+                )
+            }
+            session.preferences.useBuiltinInstaller = true
+            val source = DSUInstallationSource.MultipleImages(images)
+            if (!job.isCancelled) {
+                onPreparationFinished(source)
+            } else {
+                onCanceled()
+            }
+            return
+        }
+
+        onStepUpdate(InstallationStep.PROCESSING)
+        val zipDocument = storageManager.createDocumentFile("dsu_package.zip")
+        val zos = ZipOutputStream(BufferedOutputStream(storageManager.openOutputStream(zipDocument.uri)))
+        zos.setLevel(Deflater.NO_COMPRESSION)
+
+        var totalBytes = 0L
+        for (file in files) {
+            val size = if (file.fileSize > 0) file.fileSize else storageManager.getFilesizeFromUri(file.uri)
+            totalBytes += size
+        }
+
+        var bytesWritten = 0L
+        val buffer = ByteArray(8192 * 4)
+
+        for (file in files) {
+            if (job.isCancelled) break
+            var inputUri = file.uri
+            val ext = getExtension(file.uri)
+            if (ext == "xz" || ext == "gz" || ext == "gzip") {
+                val extracted = extractFile(file.uri, file.partitionName)
+                inputUri = extracted.first
+            }
+
+            val entryName = "${file.partitionName}.img"
+            val entry = ZipEntry(entryName)
+            zos.putNextEntry(entry)
+            val inputStream = storageManager.openInputStream(inputUri)
+            var read: Int
+            while (inputStream.read(buffer).also { read = it } != -1) {
+                if (job.isCancelled) break
+                zos.write(buffer, 0, read)
+                bytesWritten += read
+                if (totalBytes > 0) {
+                    onPreparationProgressUpdate(bytesWritten.toFloat() / totalBytes.toFloat())
+                }
+            }
+            inputStream.close()
+            zos.closeEntry()
+        }
+        zos.close()
+
+        val source = DSUInstallationSource.DsuPackage(zipDocument.uri)
+        if (!job.isCancelled) {
+            onPreparationFinished(source)
+        } else {
+            onCanceled()
+        }
     }
 
     private fun prepareRooted() {

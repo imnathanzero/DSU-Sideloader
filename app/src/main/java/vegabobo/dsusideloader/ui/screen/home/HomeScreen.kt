@@ -120,7 +120,7 @@ fun Home(
                     onClickSetSeLinuxPermissive = { homeViewModel.onClickSetSeLinuxPermissive() },
                     onClickRetryInstallation = { homeViewModel.onClickRetryInstallation() },
                     onClickClear = { homeViewModel.resetInstallationCard() },
-                    onSelectFileSuccess = { homeViewModel.onFileSelectionResult(it) },
+                    onSelectFilesSuccess = { homeViewModel.onFilesSelectionResult(it) },
                     onClickCancelInstallation = { homeViewModel.onClickCancel() },
                     onClickDiscardInstalledGsiAndInstall = { homeViewModel.onClickDiscardGsiAndStartInstallation() },
                     onClickDiscardDsu = { homeViewModel.showDiscardSheet() },

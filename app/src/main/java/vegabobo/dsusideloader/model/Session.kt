@@ -15,7 +15,10 @@ class UserSelection(
     var userSelectedImageSize: Long = DSUConstants.DEFAULT_IMAGE_SIZE,
     var selectedFileUri: Uri = Uri.EMPTY,
     var selectedFileName: String = "",
+    var selectedFiles: MutableList<SelectedImageFile> = mutableListOf(),
 ) {
+
+    fun isMultipleFiles(): Boolean = selectedFiles.size > 1
 
     fun getUserDataSizeAsGB(): String = "${(this.userSelectedUserdata / 1024L / 1024L / 1024L)}"
 

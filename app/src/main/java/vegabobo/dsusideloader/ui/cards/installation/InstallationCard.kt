@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import vegabobo.dsusideloader.R
 import vegabobo.dsusideloader.ui.components.CardBox
 import vegabobo.dsusideloader.ui.screen.home.InstallationCardState
-import vegabobo.dsusideloader.ui.util.launcherAcResult
+import vegabobo.dsusideloader.ui.util.launcherMultipleAcResult
 
 @Composable
 fun InstallationCard(
@@ -27,7 +27,7 @@ fun InstallationCard(
     onClickDiscardInstalledGsiAndInstall: () -> Unit,
     onClickDiscardDsu: () -> Unit,
     onClickRebootToDynOS: () -> Unit,
-    onSelectFileSuccess: (Uri) -> Unit,
+    onSelectFilesSuccess: (List<Uri>) -> Unit,
     onClickViewLogs: () -> Unit,
     onClickViewCommands: () -> Unit,
 ) {
@@ -41,10 +41,11 @@ fun InstallationCard(
         "application/octet-stream",
     )
     chooseFile.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes)
+    chooseFile.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
     chooseFile = Intent.createChooser(chooseFile, "")
 
-    val launcherSelectFile = launcherAcResult {
-        onSelectFileSuccess(it)
+    val launcherSelectFile = launcherMultipleAcResult {
+        onSelectFilesSuccess(it)
     }
 
     val textFieldInteraction = remember { MutableInteractionSource() }

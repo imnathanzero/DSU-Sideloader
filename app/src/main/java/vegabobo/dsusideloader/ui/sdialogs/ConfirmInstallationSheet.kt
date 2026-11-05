@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.InstallMobile
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -51,6 +52,12 @@ fun ConfirmInstallationSheet(
                     textColor = MaterialTheme.colorScheme.onBackground,
                 )
             }
+            DialogItem(
+                icon = Icons.Outlined.RestartAlt,
+                title = "${stringResource(id = R.string.reboot_required)}:",
+                text = stringResource(id = R.string.reboot_after_install_info),
+                textColor = MaterialTheme.colorScheme.onBackground,
+            )
         },
         confirmText = stringResource(id = R.string.proceed),
         cancelText = stringResource(id = R.string.cancel),

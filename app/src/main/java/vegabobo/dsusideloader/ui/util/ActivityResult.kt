@@ -16,8 +16,36 @@ fun launcherAcResult(
     return rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            result(it.data!!.data!!)
+        if (it.resultCode == Activity.RESULT_OK && it.data != null) {
+            val uri = it.data!!.data ?: it.data!!.clipData?.getItemAt(0)?.uri
+            if (uri != null) {
+                result(uri)
+            }
+        }
+    }
+}
+
+@Composable
+fun launcherMultipleAcResult(
+    result: (List<Uri>) -> Unit,
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    return rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        if (it.resultCode == Activity.RESULT_OK && it.data != null) {
+            val data = it.data!!
+            val uris = mutableListOf<Uri>()
+            val clipData = data.clipData
+            if (clipData != null) {
+                for (i in 0 until clipData.itemCount) {
+                    clipData.getItemAt(i).uri?.let { uri -> uris.add(uri) }
+                }
+            } else if (data.data != null) {
+                uris.add(data.data!!)
+            }
+            if (uris.isNotEmpty()) {
+                result(uris)
+            }
         }
     }
 }
