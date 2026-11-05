@@ -1,6 +1,5 @@
 package vegabobo.dsusideloader.ui.screen.partitions
 
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -30,12 +29,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,15 +47,12 @@ import vegabobo.dsusideloader.R
 import vegabobo.dsusideloader.ui.components.AppBottomBar
 import vegabobo.dsusideloader.ui.components.ApplicationScreen
 import vegabobo.dsusideloader.ui.components.Dialog
-import vegabobo.dsusideloader.ui.components.PreferenceItem
 import vegabobo.dsusideloader.ui.components.SimpleCard
 import vegabobo.dsusideloader.ui.components.Title
 import vegabobo.dsusideloader.ui.components.TopBar
 import vegabobo.dsusideloader.ui.components.buttons.PrimaryButton
 import vegabobo.dsusideloader.ui.components.buttons.SecondaryButton
 import vegabobo.dsusideloader.ui.screen.Destinations
-import vegabobo.dsusideloader.ui.util.launcherAcResult
-import vegabobo.dsusideloader.util.FilenameUtils
 import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -431,77 +424,6 @@ fun PartitionsScreen(
                         }
                     }
                 }
-            }
-        }
-
-        // Custom mount option
-        Title(title = stringResource(id = R.string.other))
-        PreferenceItem(
-            title = stringResource(id = R.string.mount_custom_image),
-            description = stringResource(id = R.string.mount_custom_image_desc),
-            onClick = { viewModel.setShowCustomMountDialog(true) },
-        )
-    }
-
-    // Custom mount dialog
-    if (uiState.showCustomMountDialog) {
-        var customPath by remember { mutableStateOf("") }
-        var customName by remember { mutableStateOf("") }
-        var readOnly by remember { mutableStateOf(true) }
-
-        val chooseCustomFile = remember {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.type = "*/*"
-            Intent.createChooser(intent, "")
-        }
-
-        val launcherCustomFile = launcherAcResult { uri ->
-            val realPath = FilenameUtils.getFilePath(uri, false).replace("file://", "")
-            val filename = FilenameUtils.queryName(context.contentResolver, uri)
-            customPath = realPath
-            if (customName.isEmpty()) {
-                customName = FilenameUtils.extractPartitionName(filename)
-            }
-        }
-
-        Dialog(
-            icon = Icons.Outlined.FolderOpen,
-            title = stringResource(id = R.string.mount_custom_image),
-            confirmText = stringResource(id = R.string.mount),
-            cancelText = stringResource(id = R.string.cancel),
-            onClickConfirm = {
-                viewModel.mountCustomImage(customPath, customName, readOnly)
-            },
-            onClickCancel = { viewModel.setShowCustomMountDialog(false) },
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = customPath,
-                    onValueChange = { customPath = it },
-                    label = { Text(stringResource(id = R.string.image_path)) },
-                    placeholder = { Text("/data/gsi/dsu/system_gsi.img") },
-                    trailingIcon = {
-                        IconButton(onClick = { launcherCustomFile.launch(chooseCustomFile) }) {
-                            Icon(
-                                imageVector = Icons.Outlined.FolderOpen,
-                                contentDescription = null,
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    singleLine = true,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = customName,
-                    onValueChange = { customName = it },
-                    label = { Text(stringResource(id = R.string.partition_name)) },
-                    placeholder = { Text("system") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    singleLine = true,
-                )
             }
         }
     }

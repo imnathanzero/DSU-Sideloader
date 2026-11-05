@@ -207,29 +207,6 @@ class PartitionsViewModel @Inject constructor(
         }
     }
 
-    fun mountCustomImage(customPath: String, customName: String, readOnly: Boolean = true) {
-        if (customPath.isBlank() || customName.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Path and name cannot be empty") }
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update { it.copy(isLoading = true, showCustomMountDialog = false, errorMessage = "") }
-            val cleanName = customName.trim().replace(Regex("[^a-zA-Z0-9_-]"), "_")
-            val target = "$MOUNT_BASE_PATH/$cleanName"
-            val loopOpt = if (readOnly) "loop,ro" else "loop,rw"
-            val fallbackOpt = if (readOnly) "ro" else "rw"
-            val cmd = "mkdir -p \"$target\" && (mount -o $loopOpt \"$customPath\" \"$target\" || " +
-                "mount -o $fallbackOpt \"$customPath\" \"$target\" || " +
-                "mount \"$customPath\" \"$target\")"
-            val result = Shell.cmd(cmd).exec()
-            if (!result.isSuccess) {
-                val err = result.err.joinToString("\n").ifEmpty { "Failed to mount $cleanName" }
-                _uiState.update { it.copy(errorMessage = err) }
-            }
-            scanPartitions()
-        }
-    }
-
     fun promptDeletePartition(partition: PartitionInfo) {
         _uiState.update { it.copy(partitionToDelete = partition) }
     }
@@ -249,10 +226,6 @@ class PartitionsViewModel @Inject constructor(
 
     fun dismissDeletePrompt() {
         _uiState.update { it.copy(partitionToDelete = null) }
-    }
-
-    fun setShowCustomMountDialog(show: Boolean) {
-        _uiState.update { it.copy(showCustomMountDialog = show) }
     }
 
     fun clearErrorMessage() {

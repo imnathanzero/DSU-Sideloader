@@ -83,14 +83,6 @@
     <string name="userdata_size">Wielkość partycji userdata</string>
     <string name="userdata_size_info">Rozmiar w gigabajtach</string>
     <string name="allowed_userdata_allocation">Maksymalna dostępna alokacja %1$sGB</string>
-    <!-- Image size card -->
-    <string name="image_size">Rozmiar obrazu</string>
-    <string name="image_size_info">Rozmiar w bajtach</string>
-    <string name="not_recommended_option">Ta opcja jest zdecydowanie niewskazana!</string>
-    <!-- Image size dialog -->
-    <string name="dialog_image_size">Ustaw rozmiar obrazu?</string>
-    <string name="dialog_image_size_description">DSU Sideloader ustawiy ten parametr automatycznie, ustawienie rozmiaru obrazu ręcznie jest zdecydowanie niewskazane.</string>
-    <string name="set_anyway">Ustaw mimo to</string>
     <!-- What is DSU card -->
     <string name="what_is_dsu">Co to jest DSU?</string>
     <string name="what_is_dsu_description">DSU (Dynamic System Updates) jest funkcją wprowadzoną w Android 10, która umożliwia programistom testowanie obrazów systemowych Androida bez dotykania partycji urządzenia, z Androidem 11, DSU może również zastąpić wiele partycji.</string>

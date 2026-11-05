@@ -83,14 +83,6 @@
     <string name="userdata_size">Kích thước dữ liệu người dùng</string>
     <string name="userdata_size_info">Kích thước tính bằng gigabyte</string>
     <string name="allowed_userdata_allocation">Tối đa có sẵn để phân bổ: %1$sGB</string>
-    <!-- Image size card -->
-    <string name="image_size">Kích cỡ hình ảnh</string>
-    <string name="image_size_info">Kích thước tính bằng byte</string>
-    <string name="not_recommended_option">Tùy chọn này thực sự không thể sử dụng được!</string>
-    <!-- Image size dialog -->
-    <string name="dialog_image_size">Đặt kích thước hình ảnh?</string>
-    <string name="dialog_image_size_description">DSU Sideloader sẽ tự động đặt thông số này cho bạn, việc thiết lập kích thước hình ảnh theo cách thủ công là điều không thể tránh khỏi.</string>
-    <string name="set_anyway">Vẫn đặt</string>
     <!-- What is DSU card -->
     <string name="what_is_dsu">DSU là gì?</string>
     <string name="what_is_dsu_description">DSU (Dynamic System Updates) là một tính năng được giới thiệu trong Android 10 cho phép các nhà phát triển kiểm tra hình ảnh hệ thống Android mà không cần chạm vào phân vùng thiết bị, với Android 11, DSU cũng có thể thay thế nhiều phân vùng.</string>

@@ -21,11 +21,7 @@ data class UserDataCardState(
     val isError: Boolean = false,
     val text: String = "",
     val maximumAllowed: Int = 0,
-)
-
-data class ImageSizeCardState(
-    val isSelected: Boolean = false,
-    val text: String = "",
+    val preserveSelected: Boolean = false,
 )
 
 enum class AdditionalCardState {
@@ -40,7 +36,6 @@ enum class AdditionalCardState {
 
 enum class SheetDisplayState {
     NONE,
-    IMAGESIZE_WARNING,
     CONFIRM_INSTALLATION,
     CANCEL_INSTALLATION,
     DISCARD_DSU,
@@ -50,14 +45,15 @@ enum class SheetDisplayState {
 data class HomeUiState(
     val installationCard: InstallationCardState = InstallationCardState(),
     val userDataCard: UserDataCardState = UserDataCardState(),
-    val imageSizeCard: ImageSizeCardState = ImageSizeCardState(),
     val additionalCard: AdditionalCardState = AdditionalCardState.NONE,
     val sheetDisplay: SheetDisplayState = SheetDisplayState.NONE,
     val installationLogs: String = "",
     val passedInitialChecks: Boolean = false,
     val shouldKeepScreenOn: Boolean = false,
+    val isDsuInstalled: Boolean = false,
 ) {
     fun isInstalling(): Boolean {
-        return installationCard.installationStep != InstallationStep.NOT_INSTALLING
+        return installationCard.installationStep != InstallationStep.NOT_INSTALLING &&
+            installationCard.installationStep != InstallationStep.DSU_ALREADY_INSTALLED
     }
 }

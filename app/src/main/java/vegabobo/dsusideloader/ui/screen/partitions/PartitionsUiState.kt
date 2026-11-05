@@ -6,6 +6,5 @@ data class PartitionsUiState(
     val partitions: List<PartitionInfo> = emptyList(),
     val errorMessage: String = "",
     val successMessage: String = "",
-    val showCustomMountDialog: Boolean = false,
     val partitionToDelete: PartitionInfo? = null,
 )

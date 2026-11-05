@@ -8,7 +8,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.Job
 import vegabobo.dsusideloader.core.StorageManager
-import vegabobo.dsusideloader.model.DSUConstants
 import vegabobo.dsusideloader.model.DSUInstallationSource
 import vegabobo.dsusideloader.model.ImagePartition
 import vegabobo.dsusideloader.model.Session
@@ -23,7 +22,6 @@ class Preparation(
     private val onPreparationFinished: (preparedDSU: DSUInstallationSource) -> Unit,
 ) : () -> Unit {
 
-    private val userSelectedImageSize = session.userSelection.userSelectedImageSize
     private val userSelectedFileUri = session.userSelection.selectedFileUri
 
     override fun invoke() {
@@ -216,9 +214,6 @@ class Preparation(
 
     private fun prepareGz(gzFile: Uri): Pair<Uri, Long> {
         val uri = getSafeUri(gzFile)
-        if (userSelectedImageSize != DSUConstants.DEFAULT_IMAGE_SIZE) {
-            return Pair(uri, userSelectedImageSize)
-        }
 
         onStepUpdate(InstallationStep.PROCESSING)
         val fileSize = storageManager.getFilesizeFromUri(uri)

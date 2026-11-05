@@ -8,11 +8,11 @@ import vegabobo.dsusideloader.util.OperationMode
 data class InstallationPreferences(
     var isUnmountSdCard: Boolean = false,
     var useBuiltinInstaller: Boolean = false,
+    var preserveUserdata: Boolean = false,
 )
 
 class UserSelection(
     var userSelectedUserdata: Long = DSUConstants.DEFAULT_USERDATA,
-    var userSelectedImageSize: Long = DSUConstants.DEFAULT_IMAGE_SIZE,
     var selectedFileUri: Uri = Uri.EMPTY,
     var selectedFileName: String = "",
     var selectedFiles: MutableList<SelectedImageFile> = mutableListOf(),
@@ -31,22 +31,8 @@ class UserSelection(
             }
     }
 
-    fun setImageSize(size: String) {
-        userSelectedImageSize =
-            if (size.isNotEmpty()) {
-                FilenameUtils.getDigits(size).toLong()
-            } else {
-                DSUConstants.DEFAULT_IMAGE_SIZE
-            }
-    }
-
-    fun isCustomImageSize(): Boolean {
-        return userSelectedImageSize != DSUConstants.DEFAULT_IMAGE_SIZE
-    }
-
     override fun toString(): String {
         return "UserSelection(userSelectedUserdata=$userSelectedUserdata, " +
-            "userSelectedImageSize=$userSelectedImageSize, " +
             "selectedFileUri=$selectedFileUri, " +
             "selectedFileName=$selectedFileName)"
     }
@@ -77,11 +63,7 @@ class Session(
     fun getInstallationParameters(): Triple<Long, String, Long> {
         val userdataSize = userSelection.userSelectedUserdata
         val absoluteFilePath = FilenameUtils.getFilePath(dsuInstallation.uri, true)
-
-        var imageSize = dsuInstallation.fileSize
-        if (userSelection.isCustomImageSize()) {
-            imageSize = userSelection.userSelectedImageSize
-        }
+        val imageSize = dsuInstallation.fileSize
         return Triple(userdataSize, absoluteFilePath, imageSize)
     }
 

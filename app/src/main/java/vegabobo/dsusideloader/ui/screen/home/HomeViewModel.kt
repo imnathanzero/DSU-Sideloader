@@ -80,9 +80,6 @@ class HomeViewModel @Inject constructor(
     private fun updateInstallationCard(update: (InstallationCardState) -> InstallationCardState) =
         _uiState.update { it.copy(installationCard = update(it.installationCard.copy())) }
 
-    private fun updateImageSizeCard(update: (ImageSizeCardState) -> ImageSizeCardState) =
-        _uiState.update { it.copy(imageSizeCard = update(it.imageSizeCard.copy())) }
-
     private fun updateSheetState(sheetDisplay: SheetDisplayState) =
         _uiState.update { it.copy(sheetDisplay = sheetDisplay) }
 
@@ -91,8 +88,13 @@ class HomeViewModel @Inject constructor(
         session.userSelection.selectedFileName = ""
         session.userSelection.selectedFileUri = Uri.EMPTY
         _uiState.update {
+            val installationStep = if (it.isDsuInstalled) {
+                InstallationStep.DSU_ALREADY_INSTALLED
+            } else {
+                InstallationStep.NOT_INSTALLING
+            }
             it.copy(
-                installationCard = InstallationCardState(),
+                installationCard = InstallationCardState(installationStep = installationStep),
                 sheetDisplay = SheetDisplayState.NONE,
             )
         }
@@ -114,6 +116,13 @@ class HomeViewModel @Inject constructor(
                     return@run
                 }
                 if (isInstalled) {
+                    _uiState.update {
+                        it.copy(
+                            isDsuInstalled = true,
+                            userDataCard = it.userDataCard.copy(preserveSelected = true),
+                        )
+                    }
+                    session.preferences.preserveUserdata = true
                     updateInstallationCard { it.copy(installationStep = InstallationStep.DSU_ALREADY_INSTALLED) }
                     return@run
                 }
@@ -203,7 +212,6 @@ class HomeViewModel @Inject constructor(
 
     fun onClickInstall() {
         session.userSelection.setUserDataSize(uiState.value.userDataCard.text)
-        session.userSelection.setImageSize(uiState.value.imageSizeCard.text)
         updateSheetState(SheetDisplayState.CONFIRM_INSTALLATION)
     }
 
@@ -269,6 +277,7 @@ class HomeViewModel @Inject constructor(
             onCreatePartition = this::onCreatePartition,
             onInstallationStepUpdate = this::onStepUpdate,
             onInstallationSuccess = this::onRootInstallationSuccess,
+            preserveUserdata = session.preferences.preserveUserdata,
         ).invoke()
     }
 
@@ -362,7 +371,13 @@ class HomeViewModel @Inject constructor(
             remove()
             forceStopPackage("com.android.dynsystem")
             dismissSheet()
-            resetInstallationCard()
+            _uiState.update {
+                it.copy(
+                    installationCard = InstallationCardState(),
+                    sheetDisplay = SheetDisplayState.NONE,
+                    isDsuInstalled = false,
+                )
+            }
         }
     }
 
@@ -423,22 +438,9 @@ class HomeViewModel @Inject constructor(
         updateUserdataCard { it.copy(text = sizeWithSuffix) }
     }
 
-    //
-    // Image size card
-    //
-
-    fun onCheckImageSizeCard() {
-        if (!uiState.value.imageSizeCard.isSelected) {
-            updateSheetState(SheetDisplayState.IMAGESIZE_WARNING)
-        } else {
-            dismissSheet()
-        }
-        updateImageSizeCard { it.copy(isSelected = !it.isSelected, text = "") }
-    }
-
-    fun updateImageSize(input: String) {
-        val inputWithSuffix = FilenameUtils.appendToDigitsToString(input, "b")
-        updateImageSizeCard { it.copy(text = inputWithSuffix) }
+    fun onCheckPreserveUserdata(checked: Boolean) {
+        updateUserdataCard { it.copy(preserveSelected = checked) }
+        session.preferences.preserveUserdata = checked
     }
 
     //
