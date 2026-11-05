@@ -20,18 +20,18 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
-        android:name=".DSUSideloaderApplication"
+        android:name=".SysphereApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:enableOnBackInvokedCallback="true"
         android:localeConfig="@xml/locales_config"
-        android:theme="@style/Theme.DSUHelper">
+        android:theme="@style/Theme.Sysphere">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.DSUHelper">
+            android:theme="@style/Theme.Sysphere">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -57,12 +57,12 @@
         </provider>
 
         <service
-            android:name="vegabobo.dsusideloader.service.PrivilegedSystemService"
+            android:name=".service.PrivilegedSystemService"
             android:enabled="true"
             android:exported="false" />
 
         <receiver
-            android:name="vegabobo.dsusideloader.installer.LiveNotificationActionReceiver"
+            android:name=".installer.LiveNotificationActionReceiver"
             android:exported="false" />
 
     </application>

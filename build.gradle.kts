@@ -21,7 +21,7 @@ plugins {
 
 extra.set("versionCode", 8)
 extra.set("versionName", "2.03")
-extra.set("packageName", "vegabobo.dsusideloader")
+extra.set("packageName", "git.imnathanzero.sysphere")
 
 tasks.register<Delete>("clean") {
     delete(layout.buildDirectory)
