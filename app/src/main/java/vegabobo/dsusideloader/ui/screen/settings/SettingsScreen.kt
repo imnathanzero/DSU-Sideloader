@@ -44,18 +44,10 @@ fun Settings(
             AppBottomBar(
                 currentDestination = Destinations.Preferences,
                 onNavigate = navigate,
-                showPartitions = uiState.isRoot,
             )
         },
     ) {
         Title(title = stringResource(id = R.string.installation))
-        if (uiState.isRoot) {
-            PreferenceItem(
-                title = stringResource(id = R.string.partitions_manager),
-                description = stringResource(id = R.string.partitions_manager_desc),
-                onClick = { navigate(Destinations.Partitions) },
-            )
-        }
         PreferenceItem(
             title = stringResource(id = R.string.builtin_installer),
             description =

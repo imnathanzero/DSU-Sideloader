@@ -20,7 +20,7 @@ import vegabobo.dsusideloader.ui.screen.Destinations
 fun AppBottomBar(
     currentDestination: String,
     onNavigate: (String) -> Unit,
-    showPartitions: Boolean = false,
+    showPartitions: Boolean = true,
 ) {
     NavigationBar {
         NavigationBarItem(

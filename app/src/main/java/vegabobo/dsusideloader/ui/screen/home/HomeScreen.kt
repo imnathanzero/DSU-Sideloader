@@ -74,7 +74,6 @@ fun Home(
             AppBottomBar(
                 currentDestination = Destinations.Homepage,
                 onNavigate = navigate,
-                showPartitions = homeViewModel.session.isRoot(),
             )
         },
         content = {

@@ -78,7 +78,6 @@ fun PartitionsScreen(
             AppBottomBar(
                 currentDestination = Destinations.Partitions,
                 onNavigate = navigate,
-                showPartitions = true,
             )
         },
     ) {
