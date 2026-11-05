@@ -195,6 +195,19 @@
     <string name="contributors_title">Contributors</string>
     <string name="contributors_text">People that helped with this project</string>
 
+    <string name="device_and_system">Device &amp; System</string>
+    <string name="device_model">Device</string>
+    <string name="android_version">Android version</string>
+    <string name="architecture">Architecture</string>
+    <string name="dynamic_partitions">Dynamic Partitions</string>
+    <string name="supported">Supported</string>
+    <string name="issues_and_feedback">Issues &amp; Feedback</string>
+    <string name="issues_and_feedback_desc">Report bugs or request features on GitHub</string>
+    <string name="license_notice">DSU Sideloader is free and open-source software (GPL v3)</string>
+    <string name="check_updates_now">Check now</string>
+    <string name="checking_updates">Checking for updates…</string>
+    <string name="downloading_update">Downloading update: %1$d%%</string>
+
     <!--
         ADB screen
     -->
