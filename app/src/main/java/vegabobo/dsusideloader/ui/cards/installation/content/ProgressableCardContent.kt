@@ -9,6 +9,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import vegabobo.dsusideloader.ui.components.buttons.PrimaryButton
 import vegabobo.dsusideloader.ui.components.buttons.SecondaryButton
@@ -30,11 +31,15 @@ fun ProgressableCardContent(
             .fillMaxWidth()
             .padding(top = 12.dp, bottom = 5.dp)
         if (isIndeterminate) {
-            LinearProgressIndicator(modifier = progressBarModifier)
+            LinearProgressIndicator(
+                modifier = progressBarModifier,
+                strokeCap = StrokeCap.Round,
+            )
         } else {
             LinearProgressIndicator(
                 modifier = progressBarModifier,
-                progress = progress,
+                progress = { progress },
+                strokeCap = StrokeCap.Round,
             )
         }
     }

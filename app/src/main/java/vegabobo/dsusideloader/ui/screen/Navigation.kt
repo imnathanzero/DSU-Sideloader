@@ -26,6 +26,14 @@ fun Navigation() {
         fun navigate(destination: String) {
             if (destination == Destinations.Up) {
                 navController.navigateUp()
+            } else if (destination == Destinations.Homepage || destination == Destinations.Preferences) {
+                navController.navigate(destination) {
+                    popUpTo(Destinations.Homepage) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
             } else {
                 navController.navigate(destination)
             }

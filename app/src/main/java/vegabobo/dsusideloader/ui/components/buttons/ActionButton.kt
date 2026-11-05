@@ -1,5 +1,6 @@
 package vegabobo.dsusideloader.ui.components.buttons
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +22,10 @@ fun ActionButton(
     content: @Composable () -> Unit = {},
 ) {
     if (textButton) {
-        TextButton(onClick = onClick) {
+        TextButton(
+            onClick = onClick,
+            shape = CircleShape,
+        ) {
             Text(text = text)
         }
     } else {
@@ -29,16 +33,17 @@ fun ActionButton(
             modifier = modifier,
             onClick = onClick,
             enabled = isEnabled,
+            shape = CircleShape,
             colors =
             if (colorButton != null) {
-                ButtonDefaults.buttonColors(colorButton)
+                ButtonDefaults.filledTonalButtonColors(containerColor = colorButton)
             } else {
-                ButtonDefaults.buttonColors()
+                ButtonDefaults.filledTonalButtonColors()
             },
         ) {
             Text(
                 text = text,
-                color = colorText ?: MaterialTheme.colorScheme.surface,
+                color = colorText ?: MaterialTheme.colorScheme.onSecondaryContainer,
             )
             content()
         }

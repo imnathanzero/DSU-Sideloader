@@ -4,8 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,6 +26,7 @@ import vegabobo.dsusideloader.ui.cards.warnings.SetupStorage
 import vegabobo.dsusideloader.ui.cards.warnings.StorageWarningCard
 import vegabobo.dsusideloader.ui.cards.warnings.UnlockedBootloaderCard
 import vegabobo.dsusideloader.ui.cards.warnings.UnsupportedCard
+import vegabobo.dsusideloader.ui.components.AppBottomBar
 import vegabobo.dsusideloader.ui.components.ApplicationScreen
 import vegabobo.dsusideloader.ui.components.TopBar
 import vegabobo.dsusideloader.ui.screen.Destinations
@@ -70,9 +69,13 @@ fun Home(
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.app_name),
-                icon = Icons.Outlined.Settings,
                 scrollBehavior = it,
-                onClickIcon = { navigate(Destinations.Preferences) },
+            )
+        },
+        bottomBar = {
+            AppBottomBar(
+                currentDestination = Destinations.Homepage,
+                onNavigate = navigate,
             )
         },
         content = {

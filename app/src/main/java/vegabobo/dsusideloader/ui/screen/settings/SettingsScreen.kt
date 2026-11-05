@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import vegabobo.dsusideloader.R
 import vegabobo.dsusideloader.preferences.AppPrefs
+import vegabobo.dsusideloader.ui.components.AppBottomBar
 import vegabobo.dsusideloader.ui.components.ApplicationScreen
 import vegabobo.dsusideloader.ui.components.DialogLikeBottomSheet
 import vegabobo.dsusideloader.ui.components.PreferenceItem
@@ -37,7 +38,12 @@ fun Settings(
             TopBar(
                 barTitle = stringResource(id = R.string.settings),
                 scrollBehavior = it,
-                onClickBackButton = { navigate(Destinations.Up) },
+            )
+        },
+        bottomBar = {
+            AppBottomBar(
+                currentDestination = Destinations.Preferences,
+                onNavigate = navigate,
             )
         },
     ) {

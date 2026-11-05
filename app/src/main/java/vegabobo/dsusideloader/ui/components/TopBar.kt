@@ -1,7 +1,7 @@
 package vegabobo.dsusideloader.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,12 +23,17 @@ fun TopBar(
     onClickBackButton: (() -> Unit)? = null,
 ) {
     LargeTopAppBar(
-        title = { Text(text = barTitle) },
+        title = {
+            Text(
+                text = barTitle,
+                fontWeight = FontWeight.Bold,
+            )
+        },
         navigationIcon = {
             if (onClickBackButton != null) {
                 IconButton(onClickBackButton) {
                     Icon(
-                        imageVector = Icons.Outlined.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = iconContentDescription,
                     )
                 }

@@ -26,9 +26,9 @@ fun CardBox(
     isToggleChecked: Boolean = false,
     isToggleEnabled: Boolean = true,
     addPadding: Boolean = true,
-    cardColor: Color = MaterialTheme.colorScheme.inverseOnSurface,
+    cardColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     onCheckedChange: ((Boolean) -> Unit) = {},
-    roundedCornerShape: RoundedCornerShape = RoundedCornerShape(10.dp),
+    roundedCornerShape: RoundedCornerShape = RoundedCornerShape(24.dp),
     content: @Composable (ColumnScope) -> Unit,
 ) {
     Box(
@@ -36,7 +36,7 @@ fun CardBox(
             Modifier
                 .clip(roundedCornerShape)
                 .background(cardColor)
-                .padding(all = 10.dp)
+                .padding(all = 14.dp)
                 .padding(end = 4.dp, start = 4.dp)
                 .fillMaxWidth()
         } else {
