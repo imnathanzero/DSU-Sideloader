@@ -28,11 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -65,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import git.imnathanzero.sysphere.R
+import git.imnathanzero.sysphere.preparation.InstallationStep
 import git.imnathanzero.sysphere.ui.cards.UserdataCard
 import git.imnathanzero.sysphere.ui.cards.installation.InstallationCardStep
 import git.imnathanzero.sysphere.ui.components.AppBottomBar
@@ -72,6 +76,7 @@ import git.imnathanzero.sysphere.ui.components.ApplicationScreen
 import git.imnathanzero.sysphere.ui.components.SimpleCard
 import git.imnathanzero.sysphere.ui.components.TopBar
 import git.imnathanzero.sysphere.ui.components.buttons.PrimaryButton
+import git.imnathanzero.sysphere.ui.components.buttons.SecondaryButton
 import git.imnathanzero.sysphere.ui.screen.Destinations
 import git.imnathanzero.sysphere.ui.screen.home.HomeViewModel
 import git.imnathanzero.sysphere.ui.screen.home.SheetDisplayState
@@ -605,24 +610,226 @@ private fun StepFourProgress(
     onNavigateToCommands: () -> Unit,
     onResetWizard: () -> Unit,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    val step = uiState.installationCard.installationStep
 
-    InstallationCardStep(
-        uiState = uiState.installationCard,
-        textFieldInteraction = interactionSource,
-        onClickClear = {
-            homeViewModel.resetInstallationCard()
-            onResetWizard()
-        },
-        onClickInstall = { homeViewModel.onClickInstall() },
-        onClickRetryInstallation = { homeViewModel.onClickRetryInstallation() },
-        onClickUnmountSdCardAndRetry = { homeViewModel.onClickUnmountSdCardAndRetry() },
-        onClickSetSeLinuxPermissive = { homeViewModel.onClickSetSeLinuxPermissive() },
-        onClickCancelInstallation = { homeViewModel.onClickCancel() },
-        onClickDiscardInstalledGsiAndInstall = { homeViewModel.onClickDiscardGsiAndStartInstallation() },
-        onClickDiscardDsu = { homeViewModel.showDiscardSheet() },
-        onClickRebootToDynOS = { homeViewModel.onClickRebootToDynOS() },
-        onClickViewLogs = { homeViewModel.showLogsWarning() },
-        onClickViewCommands = onNavigateToCommands,
-    )
+    when (step) {
+        InstallationStep.NOT_INSTALLING -> {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Layers,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(28.dp),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Ready to Install",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = if (homeViewModel.obtainSelectedFilename().isNotEmpty()) {
+                            "Configuration verified for ${homeViewModel.obtainSelectedFilename()}. Tap below to start installation."
+                        } else {
+                            "No image selected. Please begin from Step 1 to select a GSI image."
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    if (homeViewModel.obtainSelectedFilename().isNotEmpty()) {
+                        PrimaryButton(
+                            text = "Start Installation",
+                            onClick = { homeViewModel.onConfirmInstallationSheet() },
+                        )
+                    } else {
+                        PrimaryButton(
+                            text = "Select GSI Image",
+                            onClick = onResetWizard,
+                        )
+                    }
+                }
+            }
+        }
+
+        InstallationStep.DSU_ALREADY_INSTALLED,
+        InstallationStep.INSTALL_SUCCESS,
+        InstallationStep.INSTALL_SUCCESS_REBOOT_DYN_OS,
+        -> {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Installation Ready",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "The Dynamic System installation is complete. You can now reboot into your guest OS or manage your installation.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        SecondaryButton(
+                            text = stringResource(R.string.discard),
+                            onClick = { homeViewModel.showDiscardSheet() },
+                            modifier = Modifier.weight(1f),
+                        )
+                        PrimaryButton(
+                            text = stringResource(R.string.reboot_into_dsu),
+                            onClick = { homeViewModel.onClickRebootToDynOS() },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    SecondaryButton(
+                        text = "Start New Installation",
+                        onClick = {
+                            homeViewModel.resetInstallationCard()
+                            onResetWizard()
+                        },
+                    )
+                }
+            }
+        }
+
+        InstallationStep.REQUIRES_ADB_CMD_TO_CONTINUE -> {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Terminal,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "ADB Commands Generated",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = stringResource(R.string.require_adb_cmd_to_continue),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    PrimaryButton(
+                        text = stringResource(R.string.see_commands),
+                        onClick = onNavigateToCommands,
+                    )
+                }
+            }
+        }
+
+        else -> {
+            val interactionSource = remember { MutableInteractionSource() }
+            InstallationCardStep(
+                uiState = uiState.installationCard,
+                textFieldInteraction = interactionSource,
+                onClickClear = {
+                    homeViewModel.resetInstallationCard()
+                    onResetWizard()
+                },
+                onClickInstall = { homeViewModel.onClickInstall() },
+                onClickRetryInstallation = { homeViewModel.onClickRetryInstallation() },
+                onClickUnmountSdCardAndRetry = { homeViewModel.onClickUnmountSdCardAndRetry() },
+                onClickSetSeLinuxPermissive = { homeViewModel.onClickSetSeLinuxPermissive() },
+                onClickCancelInstallation = { homeViewModel.onClickCancel() },
+                onClickDiscardInstalledGsiAndInstall = { homeViewModel.onClickDiscardGsiAndStartInstallation() },
+                onClickDiscardDsu = { homeViewModel.showDiscardSheet() },
+                onClickRebootToDynOS = { homeViewModel.onClickRebootToDynOS() },
+                onClickViewLogs = { homeViewModel.showLogsWarning() },
+                onClickViewCommands = onNavigateToCommands,
+            )
+        }
+    }
 }
