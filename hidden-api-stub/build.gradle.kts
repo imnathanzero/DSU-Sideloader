@@ -5,7 +5,12 @@ plugins {
 
 android {
     namespace = "vegabobo.dsusideloader"
-    compileSdk = 33
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 
     defaultConfig {
         minSdk = 29

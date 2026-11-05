@@ -12,15 +12,17 @@ plugins {
     id("org.jetbrains.kotlin.android") apply false
     id("org.jetbrains.kotlin.multiplatform") apply false
     id("org.jetbrains.kotlin.plugin.serialization") apply false
+    id("org.jetbrains.kotlin.plugin.compose") apply false
+    id("com.google.devtools.ksp") apply false
 
     id("com.mikepenz.aboutlibraries.plugin") apply false
     id("org.jmailen.kotlinter") apply false
 }
 
-val versionCode by extra { 8 }
-val versionName by extra { "2.03" }
-val packageName by extra { "vegabobo.dsusideloader" }
+extra.set("versionCode", 8)
+extra.set("versionName", "2.03")
+extra.set("packageName", "vegabobo.dsusideloader")
 
-task("clean") {
-    delete(project.buildDir)
+tasks.register<Delete>("clean") {
+    delete(layout.buildDirectory)
 }
