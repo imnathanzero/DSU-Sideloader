@@ -150,6 +150,7 @@
     <string name="full_logcat_logging_description">Logs section will capture logs with no filters, may degrade app performance</string>
 
     <string name="keep_screen_on">Keep screen on</string>
+    <string name="keep_screen_on_description">Keep screen awake while preparing and installing</string>
 
     <string name="developer_options">Developer options</string>
 
