@@ -136,10 +136,15 @@ class PartitionsViewModel @Inject constructor(
                 }
             }
 
+            // Check kernel loop device support (CONFIG_BLK_DEV_LOOP)
+            val loopCheckCmd = "grep -q 'loop' /proc/devices || [ -c /dev/loop-control ] || [ -c /dev/block/loop-control ]"
+            val hasLoop = Shell.cmd(loopCheckCmd).exec().isSuccess
+
             _uiState.update {
                 it.copy(
                     isLoading = false,
                     partitions = partitionsList.sortedBy { p -> p.name },
+                    hasLoopSupport = hasLoop,
                 )
             }
         }
@@ -210,9 +215,12 @@ class PartitionsViewModel @Inject constructor(
             val cmd = buildMountCommand(partition.path, target, readOnly)
             val result = Shell.cmd(cmd).exec()
             if (!result.isSuccess) {
-                val err = (result.err + result.out).filter { it.isNotBlank() }.joinToString("\n")
-                    .ifEmpty { "Failed to mount ${partition.name}" }
-                _uiState.update { it.copy(errorMessage = err) }
+                var err = (result.err + result.out).filter { it.isNotBlank() }.joinToString("\n")
+                if (!_uiState.value.hasLoopSupport && !partition.path.startsWith("/dev/block/")) {
+                    err += (if (err.isNotEmpty()) "\n\n" else "") +
+                        "Kernel lacks loop device support (CONFIG_BLK_DEV_LOOP). Cannot mount raw image files."
+                }
+                _uiState.update { it.copy(errorMessage = err.ifEmpty { "Failed to mount ${partition.name}" }) }
             }
             scanPartitions()
         }

@@ -104,6 +104,28 @@ fun PartitionsScreen(
             return@ApplicationScreen
         }
 
+        if (!uiState.hasLoopSupport) {
+            SimpleCard {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.WarningAmber,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(32.dp),
+                    )
+                    Spacer(modifier = Modifier.size(12.dp))
+                    Text(
+                        text = stringResource(id = R.string.kernel_no_loop_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
+        }
+
         // Overview / Mount Target Card
         SimpleCard {
             Column(modifier = Modifier.fillMaxWidth()) {

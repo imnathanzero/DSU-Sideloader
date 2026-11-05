@@ -7,4 +7,5 @@ data class PartitionsUiState(
     val errorMessage: String = "",
     val successMessage: String = "",
     val partitionToDelete: PartitionInfo? = null,
+    val hasLoopSupport: Boolean = true,
 )

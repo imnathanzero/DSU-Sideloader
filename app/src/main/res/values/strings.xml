@@ -258,5 +258,6 @@
     <string name="copy_mount_path">Copy path</string>
     <string name="mount_path_copied">Mount path copied to clipboard</string>
     <string name="refresh">Refresh</string>
+    <string name="kernel_no_loop_warning">Your kernel lacks loop device support (CONFIG_BLK_DEV_LOOP). Mounting raw partition images may fail unless you use a kernel with loop support.</string>
     <string name="partitions_reboot_note">A device reboot is required after processing DSU partitions to boot into the dynamic system. Unmount all partitions before rebooting.</string>
 </resources>
