@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListe
             // Shell.enableVerboseLogging = BuildConfig.DEBUG
             Shell.setDefaultBuilder(
                 Shell.Builder.create()
-                    .setFlags(Shell.FLAG_REDIRECT_STDERR)
+                    .setFlags(Shell.FLAG_REDIRECT_STDERR or Shell.FLAG_MOUNT_MASTER)
                     .setTimeout(10),
             )
         }

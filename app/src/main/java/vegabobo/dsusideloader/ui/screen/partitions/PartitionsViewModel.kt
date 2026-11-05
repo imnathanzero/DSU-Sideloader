@@ -53,8 +53,8 @@ class PartitionsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, errorMessage = "") }
 
-            // Ensure base mount directory exists
-            Shell.cmd("mkdir -p $MOUNT_BASE_PATH").exec()
+            // Ensure base mount directory exists with proper permissions
+            Shell.cmd("mkdir -p $MOUNT_BASE_PATH && chmod 777 $MOUNT_BASE_PATH && chcon u:object_r:system_data_file:s0 $MOUNT_BASE_PATH 2>/dev/null").exec()
 
             // 1. Inspect active mounts from /proc/mounts
             val mountsResult = Shell.cmd("cat /proc/mounts | grep '$MOUNT_BASE_PATH'").exec()
@@ -79,8 +79,8 @@ class PartitionsViewModel @Inject constructor(
                 }
             }
 
-            // 2. Discover partition images and mapper devices
-            val scanCommand = "find /data/gsi -type f 2>/dev/null; ls -1 /dev/block/mapper/dsu* /dev/block/mapper/gsi* 2>/dev/null"
+            // 2. Discover partition images and mapper devices (prioritizing active block mappers)
+            val scanCommand = "ls -1 /dev/block/mapper/dsu* /dev/block/mapper/gsi* 2>/dev/null; find /data/gsi -type f 2>/dev/null"
             val scanResult = Shell.cmd(scanCommand).exec()
 
             val partitionsList = mutableListOf<PartitionInfo>()
@@ -145,18 +145,73 @@ class PartitionsViewModel @Inject constructor(
         }
     }
 
+    private fun buildMountCommand(source: String, target: String, readOnly: Boolean): String {
+        val opt = if (readOnly) "ro" else "rw"
+        return """
+            mkdir -p "$target" && chmod 777 "$target"
+            chcon u:object_r:system_data_file:s0 "$target" 2>/dev/null
+            if [ -b "$source" ]; then
+                mount -t erofs -o ro "$source" "$target" 2>/dev/null || \
+                mount -t ext4 -o $opt "$source" "$target" 2>/dev/null || \
+                mount -t f2fs -o $opt "$source" "$target" 2>/dev/null || \
+                mount -o $opt "$source" "$target" 2>/dev/null || \
+                mount -o ro "$source" "$target" 2>/dev/null || \
+                mount "$source" "$target"
+            else
+                LDEV=${'$'}(losetup -j "$source" 2>/dev/null | cut -d: -f1 | head -n1)
+                [ -z "${'$'}LDEV" ] && LDEV=${'$'}(losetup -fs${if (readOnly) "r" else ""} "$source" 2>/dev/null)
+                if [ -z "${'$'}LDEV" ]; then
+                    FLOOP=${'$'}(losetup -f 2>/dev/null)
+                    if [ -n "${'$'}FLOOP" ]; then
+                        losetup ${if (readOnly) "-r" else ""} "${'$'}FLOOP" "$source" 2>/dev/null && LDEV="${'$'}FLOOP"
+                    fi
+                fi
+                if [ -n "${'$'}LDEV" ]; then
+                    mount -t erofs -o ro "${'$'}LDEV" "$target" 2>/dev/null || \
+                    mount -t ext4 -o $opt "${'$'}LDEV" "$target" 2>/dev/null || \
+                    mount -t f2fs -o $opt "${'$'}LDEV" "$target" 2>/dev/null || \
+                    mount -o $opt "${'$'}LDEV" "$target" 2>/dev/null || \
+                    mount -o ro "${'$'}LDEV" "$target" 2>/dev/null || \
+                    mount "${'$'}LDEV" "$target"
+                else
+                    mount -t erofs -o ro "$source" "$target" 2>/dev/null || \
+                    mount -t ext4 -o $opt "$source" "$target" 2>/dev/null || \
+                    mount -t f2fs -o $opt "$source" "$target" 2>/dev/null || \
+                    mount -o $opt "$source" "$target" 2>/dev/null || \
+                    mount -o ro "$source" "$target" 2>/dev/null || \
+                    mount "$source" "$target"
+                fi
+            fi
+        """.trimIndent()
+    }
+
+    private fun buildUnmountCommand(target: String, source: String): String {
+        return """
+            LDEV=${'$'}(grep " $target " /proc/mounts 2>/dev/null | awk '{print ${'$'}1}' | head -n1)
+            umount -d "$target" 2>/dev/null || \
+            umount -l "$target" 2>/dev/null || \
+            umount "$target" 2>/dev/null
+            if [ -n "${'$'}LDEV" ] && echo "${'$'}LDEV" | grep -q "loop"; then
+                losetup -d "${'$'}LDEV" 2>/dev/null
+            fi
+            if [ -n "$source" ] && [ -f "$source" ]; then
+                for d in ${'$'}(losetup -j "$source" 2>/dev/null | cut -d: -f1); do
+                    losetup -d "${'$'}d" 2>/dev/null
+                done
+            fi
+            rmdir "$target" 2>/dev/null
+        """.trimIndent()
+    }
+
     fun mountPartition(partition: PartitionInfo, readOnly: Boolean = true) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, errorMessage = "") }
             val target = "$MOUNT_BASE_PATH/${partition.name}"
-            val loopOpt = if (readOnly) "loop,ro" else "loop,rw"
-            val fallbackOpt = if (readOnly) "ro" else "rw"
-            val cmd = "mkdir -p \"$target\" && (mount -o $loopOpt \"${partition.path}\" \"$target\" || " +
-                "mount -o $fallbackOpt \"${partition.path}\" \"$target\" || " +
-                "mount \"${partition.path}\" \"$target\")"
+            val cmd = buildMountCommand(partition.path, target, readOnly)
             val result = Shell.cmd(cmd).exec()
             if (!result.isSuccess) {
-                val err = result.err.joinToString("\n").ifEmpty { "Failed to mount ${partition.name}" }
+                val err = (result.err + result.out).filter { it.isNotBlank() }.joinToString("\n")
+                    .ifEmpty { "Failed to mount ${partition.name}" }
                 _uiState.update { it.copy(errorMessage = err) }
             }
             scanPartitions()
@@ -167,10 +222,11 @@ class PartitionsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, errorMessage = "") }
             val target = partition.mountPoint.ifEmpty { "$MOUNT_BASE_PATH/${partition.name}" }
-            val cmd = "(umount \"$target\" || umount -l \"$target\") && rmdir \"$target\""
+            val cmd = buildUnmountCommand(target, partition.path)
             val result = Shell.cmd(cmd).exec()
             if (!result.isSuccess) {
-                val err = result.err.joinToString("\n").ifEmpty { "Failed to unmount ${partition.name}" }
+                val err = (result.err + result.out).filter { it.isNotBlank() }.joinToString("\n")
+                    .ifEmpty { "Failed to unmount ${partition.name}" }
                 _uiState.update { it.copy(errorMessage = err) }
             }
             scanPartitions()
@@ -183,11 +239,7 @@ class PartitionsViewModel @Inject constructor(
             val unmounted = _uiState.value.partitions.filter { !it.isMounted }
             for (p in unmounted) {
                 val target = "$MOUNT_BASE_PATH/${p.name}"
-                val loopOpt = if (readOnly) "loop,ro" else "loop,rw"
-                val fallbackOpt = if (readOnly) "ro" else "rw"
-                val cmd = "mkdir -p \"$target\" && (mount -o $loopOpt \"${p.path}\" \"$target\" || " +
-                    "mount -o $fallbackOpt \"${p.path}\" \"$target\" || " +
-                    "mount \"${p.path}\" \"$target\")"
+                val cmd = buildMountCommand(p.path, target, readOnly)
                 Shell.cmd(cmd).exec()
             }
             scanPartitions()
@@ -200,7 +252,7 @@ class PartitionsViewModel @Inject constructor(
             val mounted = _uiState.value.partitions.filter { it.isMounted }
             for (p in mounted) {
                 val target = p.mountPoint.ifEmpty { "$MOUNT_BASE_PATH/${p.name}" }
-                val cmd = "(umount \"$target\" || umount -l \"$target\") && rmdir \"$target\""
+                val cmd = buildUnmountCommand(target, p.path)
                 Shell.cmd(cmd).exec()
             }
             scanPartitions()
@@ -217,7 +269,8 @@ class PartitionsViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, partitionToDelete = null) }
             if (partition.isMounted) {
                 val target = partition.mountPoint.ifEmpty { "$MOUNT_BASE_PATH/${partition.name}" }
-                Shell.cmd("(umount \"$target\" || umount -l \"$target\") && rmdir \"$target\"").exec()
+                val cmd = buildUnmountCommand(target, partition.path)
+                Shell.cmd(cmd).exec()
             }
             Shell.cmd("rm -f \"${partition.path}\"").exec()
             scanPartitions()
