@@ -8,8 +8,8 @@ import android.util.Log
 class LiveNotificationActionReceiver : BroadcastReceiver() {
 
     companion object {
-        const val ACTION_CANCEL_INSTALLATION = "git.imnathanzero.sysphere.ACTION_CANCEL_INSTALLATION"
-        const val ACTION_REBOOT_DSU = "git.imnathanzero.sysphere.ACTION_REBOOT_DSU"
+        const val ACTION_CANCEL_INSTALLATION = InstallationLiveUpdateNotifier.ACTION_CANCEL_INSTALLATION
+        const val ACTION_REBOOT_DSU = InstallationLiveUpdateNotifier.ACTION_REBOOT_DSU
     }
 
     override fun onReceive(context: Context, intent: Intent) {
