@@ -1,37 +1,28 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
-    <!-- Primary Base Orbital Ring -->
+    <!-- Outer Ring -->
     <path
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="3.6"
-        android:strokeLineCap="round"
-        android:pathData="M 54,31 A 23,23 0 1,0 54.01,31 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.2"
+        android:pathData="M 12,6.3 A 5.7,5.7 0 1,0 12.01,6.3 Z" />
 
-    <!-- Rotated Secondary Orbital Ring -->
+    <!-- Tilted Orbit -->
     <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="-38">
-
-        <!-- Outer Elliptical Orbit -->
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="-45">
         <path
-            android:strokeColor="#FFFFFFFF"
-            android:strokeWidth="3.6"
-            android:strokeLineCap="round"
-            android:pathData="M 54,38 A 27,16 0 1,0 54.01,38 Z" />
-
-        <!-- Satellite Node on Secondary Orbit -->
-        <path
-            android:fillColor="#FFFFFFFF"
-            android:pathData="M 81,54 A 4,4 0 1,0 81.01,54 Z" />
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="0.9"
+            android:pathData="M 12,9.4 A 6.0,2.6 0 1,0 12.01,9.4 Z" />
     </group>
 
-    <!-- Central Core Sphere -->
+    <!-- Core Dot -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M 54,48 A 6.5,6.5 0 1,0 54.01,48 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 12,10.8 A 1.2,1.2 0 1,0 12.01,10.8 Z" />
 </vector>

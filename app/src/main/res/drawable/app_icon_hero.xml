@@ -1,4 +1,35 @@
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_launcher_background" />
-    <item android:drawable="@drawable/ic_launcher_foreground" />
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="128dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+
+    <!-- Dark Rounded Backdrop -->
+    <path
+        android:fillColor="#0B0F0E"
+        android:pathData="M 64,4 A 60,60 0 1,0 64.01,4 Z" />
+
+    <!-- Primary Host System Sphere Ring -->
+    <path
+        android:strokeColor="#C9F1E8"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:pathData="M 64,33.5 A 30.5,30.5 0 1,0 64.01,33.5 Z" />
+
+    <!-- Tilted Guest Environment Orbital Ring (-45 degrees) -->
+    <group
+        android:pivotX="64"
+        android:pivotY="64"
+        android:rotation="-45">
+        <path
+            android:strokeColor="#83CDBC"
+            android:strokeWidth="3.8"
+            android:strokeLineCap="round"
+            android:pathData="M 64,50 A 32.5,14 0 1,0 64.01,50 Z" />
+    </group>
+
+    <!-- Central System Core Dot -->
+    <path
+        android:fillColor="#C9F1E8"
+        android:pathData="M 64,57.8 A 6.2,6.2 0 1,0 64.01,57.8 Z" />
+</vector>

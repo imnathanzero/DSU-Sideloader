@@ -4,34 +4,28 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Primary Base Orbital Ring -->
+    <!-- Primary Host System Sphere Ring -->
     <path
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="3.2"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.6"
         android:strokeLineCap="round"
-        android:pathData="M 54,31 A 23,23 0 1,0 54.01,31 Z" />
+        android:pathData="M 54,28.5 A 25.5,25.5 0 1,0 54.01,28.5 Z" />
 
-    <!-- Rotated Secondary Orbital Ring -->
+    <!-- Tilted Guest Environment Orbital Ring (-45 degrees) -->
     <group
         android:pivotX="54"
         android:pivotY="54"
-        android:rotation="-38">
-
-        <!-- Outer Elliptical Orbit -->
+        android:rotation="-45">
         <path
-            android:strokeColor="#FFFFFFFF"
+            android:strokeColor="#FFFFFF"
             android:strokeWidth="3.2"
             android:strokeLineCap="round"
-            android:pathData="M 54,38 A 27,16 0 1,0 54.01,38 Z" />
-
-        <!-- Satellite Node on Secondary Orbit -->
-        <path
-            android:fillColor="#FFFFFFFF"
-            android:pathData="M 81,54 A 3.6,3.6 0 1,0 81.01,54 Z" />
+            android:strokeAlpha="0.75"
+            android:pathData="M 54,42.2 A 27.2,11.8 0 1,0 54.01,42.2 Z" />
     </group>
 
-    <!-- Central Core Sphere -->
+    <!-- Central System Core Dot -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M 54,48 A 6,6 0 1,0 54.01,48 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,48.8 A 5.2,5.2 0 1,0 54.01,48.8 Z" />
 </vector>
