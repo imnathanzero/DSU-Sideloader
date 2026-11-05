@@ -1,12 +1,14 @@
 package vegabobo.dsusideloader.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.InstallMobile
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.InstallMobile
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,9 +22,9 @@ import vegabobo.dsusideloader.ui.screen.Destinations
 fun AppBottomBar(
     currentDestination: String,
     onNavigate: (String) -> Unit,
-    showPartitions: Boolean = true,
 ) {
     NavigationBar {
+        // 1. Home Dashboard
         NavigationBarItem(
             selected = currentDestination == Destinations.Homepage,
             onClick = {
@@ -33,36 +35,59 @@ fun AppBottomBar(
             icon = {
                 Icon(
                     imageVector = if (currentDestination == Destinations.Homepage) {
+                        Icons.Filled.Home
+                    } else {
+                        Icons.Outlined.Home
+                    },
+                    contentDescription = stringResource(R.string.nav_home),
+                )
+            },
+            label = { Text(text = stringResource(R.string.nav_home)) },
+        )
+
+        // 2. Installation Wizard
+        NavigationBarItem(
+            selected = currentDestination == Destinations.Install,
+            onClick = {
+                if (currentDestination != Destinations.Install) {
+                    onNavigate(Destinations.Install)
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = if (currentDestination == Destinations.Install) {
                         Icons.Filled.InstallMobile
                     } else {
                         Icons.Outlined.InstallMobile
                     },
-                    contentDescription = stringResource(R.string.installation),
+                    contentDescription = stringResource(R.string.nav_install),
                 )
             },
-            label = { Text(text = stringResource(R.string.installation)) },
+            label = { Text(text = stringResource(R.string.nav_install)) },
         )
-        if (showPartitions) {
-            NavigationBarItem(
-                selected = currentDestination == Destinations.Partitions,
-                onClick = {
-                    if (currentDestination != Destinations.Partitions) {
-                        onNavigate(Destinations.Partitions)
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = if (currentDestination == Destinations.Partitions) {
-                            Icons.Filled.Storage
-                        } else {
-                            Icons.Outlined.Storage
-                        },
-                        contentDescription = stringResource(R.string.partitions),
-                    )
-                },
-                label = { Text(text = stringResource(R.string.partitions)) },
-            )
-        }
+
+        // 3. Systems Manager
+        NavigationBarItem(
+            selected = currentDestination == Destinations.Systems || currentDestination == Destinations.Partitions,
+            onClick = {
+                if (currentDestination != Destinations.Systems) {
+                    onNavigate(Destinations.Systems)
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = if (currentDestination == Destinations.Systems || currentDestination == Destinations.Partitions) {
+                        Icons.Filled.Layers
+                    } else {
+                        Icons.Outlined.Layers
+                    },
+                    contentDescription = stringResource(R.string.nav_systems),
+                )
+            },
+            label = { Text(text = stringResource(R.string.nav_systems)) },
+        )
+
+        // 4. Settings
         NavigationBarItem(
             selected = currentDestination == Destinations.Preferences,
             onClick = {
@@ -77,10 +102,10 @@ fun AppBottomBar(
                     } else {
                         Icons.Outlined.Settings
                     },
-                    contentDescription = stringResource(R.string.settings),
+                    contentDescription = stringResource(R.string.nav_settings),
                 )
             },
-            label = { Text(text = stringResource(R.string.settings)) },
+            label = { Text(text = stringResource(R.string.nav_settings)) },
         )
     }
 }

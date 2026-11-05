@@ -60,10 +60,14 @@ fun LiveInstallationBanner(
     modifier: Modifier = Modifier,
 ) {
     val isVisible = currentDestination != Destinations.Homepage &&
+        currentDestination != Destinations.Install &&
         (liveState.isInstalling || liveState.isSuccess || liveState.isError)
 
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val hasBottomBar = currentDestination == Destinations.Preferences ||
+    val hasBottomBar = currentDestination == Destinations.Homepage ||
+        currentDestination == Destinations.Install ||
+        currentDestination == Destinations.Systems ||
+        currentDestination == Destinations.Preferences ||
         currentDestination == Destinations.Partitions
     val bottomOffset = if (hasBottomBar) 88.dp + navBarPadding else 16.dp + navBarPadding
 

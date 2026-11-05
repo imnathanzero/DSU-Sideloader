@@ -17,13 +17,16 @@ import vegabobo.dsusideloader.ui.components.LiveInstallationBanner
 import vegabobo.dsusideloader.ui.screen.about.AboutScreen
 import vegabobo.dsusideloader.ui.screen.adb.AdbScreen
 import vegabobo.dsusideloader.ui.screen.home.Home
+import vegabobo.dsusideloader.ui.screen.install.InstallScreen
 import vegabobo.dsusideloader.ui.screen.libraries.LibrariesScreen
-import vegabobo.dsusideloader.ui.screen.partitions.PartitionsScreen
 import vegabobo.dsusideloader.ui.screen.settings.Settings
+import vegabobo.dsusideloader.ui.screen.systems.SystemsScreen
 import vegabobo.dsusideloader.util.collectAsStateWithLifecycle
 
 object Destinations {
     const val Homepage = "home"
+    const val Install = "install"
+    const val Systems = "systems"
     const val Preferences = "preferences"
     const val Partitions = "partitions"
     const val ADBInstallation = "adb_installation"
@@ -49,6 +52,8 @@ fun Navigation() {
                     navController.navigateUp()
                 } else if (
                     destination == Destinations.Homepage ||
+                    destination == Destinations.Install ||
+                    destination == Destinations.Systems ||
                     destination == Destinations.Preferences ||
                     destination == Destinations.Partitions
                 ) {
@@ -65,8 +70,10 @@ fun Navigation() {
             }
 
             composable(Destinations.Homepage) { Home(navigate = { navigate(it) }) }
+            composable(Destinations.Install) { InstallScreen(navigate = { navigate(it) }) }
+            composable(Destinations.Systems) { SystemsScreen(navigate = { navigate(it) }) }
             composable(Destinations.Preferences) { Settings(navigate = { navigate(it) }) }
-            composable(Destinations.Partitions) { PartitionsScreen(navigate = { navigate(it) }) }
+            composable(Destinations.Partitions) { SystemsScreen(navigate = { navigate(it) }) }
             composable(Destinations.ADBInstallation) { AdbScreen(navigate = { navigate(it) }) }
             composable(Destinations.About) { AboutScreen(navigate = { navigate(it) }) }
             composable(Destinations.Libraries) { LibrariesScreen(navigate = { navigate(it) }) }
@@ -76,7 +83,7 @@ fun Navigation() {
             liveState = liveState,
             currentDestination = currentDestination,
             onNavigateHome = {
-                navController.navigate(Destinations.Homepage) {
+                navController.navigate(Destinations.Install) {
                     popUpTo(Destinations.Homepage) {
                         saveState = true
                     }

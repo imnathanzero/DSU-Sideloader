@@ -260,6 +260,48 @@
     <string name="installation">Installation</string>
     <string name="discard">Discard</string>
 
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_install">Install</string>
+    <string name="nav_systems">Systems</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Systems Manager -->
+    <string name="systems_manager">Systems Manager</string>
+    <string name="dsu_environment">DSU Environment</string>
+    <string name="guest_system">Guest Dynamic System</string>
+    <string name="host_system">Host System</string>
+    <string name="running_guest_os">Currently running in Dynamic System (GSI)</string>
+    <string name="dsu_installed_ready">Dynamic System installed and ready to boot</string>
+    <string name="no_dsu_installed">No Dynamic System installed</string>
+    <string name="no_dsu_desc">Install a Generic System Image (GSI) to run a secondary Android environment safely without touching your host partitions.</string>
+    <string name="system_actions">System Actions</string>
+    <string name="reboot_to_host">Reboot to Host System</string>
+
+    <!-- Wizard Steps -->
+    <string name="wizard_step_select">1. Select GSI</string>
+    <string name="wizard_step_configure">2. Configure</string>
+    <string name="wizard_step_review">3. Review</string>
+    <string name="wizard_step_progress">4. Progress</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_start_install">Start Installation</string>
+    <string name="summary_target_gsi">Selected GSI</string>
+    <string name="summary_userdata">Allocated Userdata</string>
+    <string name="summary_operation_mode">Operation Mode</string>
+    <string name="summary_ready">All parameters verified. Proceed when ready.</string>
+
+    <!-- Dashboard Quick Actions -->
+    <string name="quick_actions">Quick Actions</string>
+    <string name="system_status">System Status</string>
+    <string name="device_specs">Device Information</string>
+    <string name="action_install_gsi">Install GSI</string>
+    <string name="action_install_gsi_desc">Flash a Generic System Image via DSU</string>
+    <string name="action_manage_systems">Manage Systems</string>
+    <string name="action_manage_systems_desc">Inspect or boot installed DSU partitions</string>
+    <string name="action_diagnostics">Diagnostics</string>
+    <string name="action_diagnostics_desc">View installation and system logs</string>
+
     <string name="close_app">Close app</string>
     <string name="close_app_question">Close app?</string>
 
