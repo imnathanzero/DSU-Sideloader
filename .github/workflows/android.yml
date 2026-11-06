@@ -33,6 +33,13 @@ jobs:
         SIGNING_STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
       run: ./gradlew assembleRelease
       
+    - name: Upload Release APK as GitHub Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: app/build/outputs/apk/release/*.apk
+        if-no-files-found: error
+
     - name: Upload release APK to GoFile
       id: upload-release
       run: |
@@ -43,27 +50,42 @@ jobs:
             exit 1
           fi
 
-          RESPONSE=$(curl \
-            --fail-with-body \
-            --silent \
-            --show-error \
-            -F "file=@${FILE}" \
-            https://upload.gofile.io/uploadfile)
+          SERVERS=$(curl -s --retry 3 --retry-delay 2 https://api.gofile.io/servers | jq -r '.data.servers[].name // empty')
+          URL=""
 
-          echo "$RESPONSE"
+          for SERVER in $SERVERS; do
+            echo "Attempting upload to GoFile server: $SERVER"
+            RESPONSE=$(curl \
+              --fail-with-body \
+              --silent \
+              --show-error \
+              --retry 2 \
+              --retry-delay 3 \
+              -F "file=@${FILE}" \
+              "https://${SERVER}.gofile.io/contents/uploadfile" 2>/dev/null) || true
 
-          URL=$(echo "$RESPONSE" | jq -r '.data.downloadPage // empty')
+            URL=$(echo "$RESPONSE" | jq -r '.data.downloadPage // empty')
+            if [ -n "$URL" ]; then
+              echo "Upload successful: $URL"
+              break
+            fi
+          done
 
           if [ -z "$URL" ]; then
-            echo "::error::GoFile did not return a download URL."
-            exit 1
+            echo "::warning::GoFile upload failed across available servers."
+            {
+              echo "## 📦 APK Downloads"
+              echo ""
+              echo "Release APK available in **Workflow Artifacts** above."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Release APK: $URL"
+            {
+              echo "## 📦 APK Downloads"
+              echo ""
+              echo "### Release"
+              echo "[Download Release APK]($URL)"
+              echo ""
+              echo "*(Also available in **Workflow Artifacts** above)*"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
-
-          echo "Release APK: $URL"
-
-          {
-            echo "## 📦 APK Downloads"
-            echo ""
-            echo "### Release"
-            echo "[Download Release APK]($URL)"
-          } >> "$GITHUB_STEP_SUMMARY"
