@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "vegabobo.dsusideloader"
+    namespace = "me.nathan.dsusideloader"
     compileSdk = 35
 
     compileOptions {
