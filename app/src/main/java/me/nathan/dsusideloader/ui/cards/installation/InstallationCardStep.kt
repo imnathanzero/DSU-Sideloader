@@ -2,6 +2,7 @@ package me.nathan.dsusideloader.ui.cards.installation
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import me.nathan.dsusideloader.R
 import me.nathan.dsusideloader.preparation.InstallationStep
@@ -12,7 +13,8 @@ import me.nathan.dsusideloader.ui.screen.home.InstallationCardState
 @Composable
 fun InstallationCardStep(
     uiState: InstallationCardState,
-    textFieldInteraction: MutableInteractionSource,
+    onClickSelectFile: () -> Unit = {},
+    textFieldInteraction: MutableInteractionSource = remember { MutableInteractionSource() },
     minPercentageOfFreeStorage: String = "40",
     onClickClear: () -> Unit,
     onClickInstall: () -> Unit,
@@ -29,6 +31,7 @@ fun InstallationCardStep(
     when (uiState.installationStep) {
         InstallationStep.NOT_INSTALLING ->
             NotInstallingCardContent(
+                onClickSelectFile = onClickSelectFile,
                 textFieldInteraction = textFieldInteraction,
                 uiState = uiState,
                 onClickClear = onClickClear,

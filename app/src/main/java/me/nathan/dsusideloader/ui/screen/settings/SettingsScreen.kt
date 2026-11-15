@@ -67,8 +67,8 @@ fun Settings(
         Title(title = stringResource(id = R.string.installation))
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
             tonalElevation = 1.dp,
         ) {
             Column {
@@ -136,8 +136,8 @@ fun Settings(
             Title(title = stringResource(id = R.string.developer_options))
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(22.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                 tonalElevation = 1.dp,
             ) {
                 Column {
@@ -176,8 +176,8 @@ fun Settings(
         Title(title = stringResource(id = R.string.other))
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
             tonalElevation = 1.dp,
         ) {
             Column {

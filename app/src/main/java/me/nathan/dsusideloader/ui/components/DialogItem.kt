@@ -1,7 +1,9 @@
 package me.nathan.dsusideloader.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -18,12 +20,17 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun DialogItem(
+    modifier: Modifier = Modifier,
     icon: ImageVector,
     title: String,
     text: String,
     textColor: Color = Color.Unspecified,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+    ) {
         Icon(
             modifier = Modifier
                 .size(32.dp)
@@ -32,7 +39,12 @@ fun DialogItem(
             imageVector = icon,
             contentDescription = "Icon",
         )
-        Column(Modifier.padding(4.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .padding(4.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
             Text(
                 text = title,
                 fontSize = 12.sp,

@@ -53,6 +53,10 @@ fun InstallationCard(
         launcherSelectFile.launch(chooseFile)
     }
 
+    val onClickSelectFile = {
+        launcherSelectFile.launch(chooseFile)
+    }
+
     CardBox(
         cardTitle = stringResource(R.string.installation),
         addToggle = false,
@@ -61,6 +65,7 @@ fun InstallationCard(
         InstallationCardStep(
             uiState = uiState,
             textFieldInteraction = textFieldInteraction,
+            onClickSelectFile = onClickSelectFile,
             onClickClear = onClickClear,
             onClickInstall = onClickInstall,
             onClickRetryInstallation = onClickRetryInstallation,

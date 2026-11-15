@@ -1,9 +1,9 @@
 package me.nathan.dsusideloader.ui.components
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +30,16 @@ fun Dialog(
 ) {
     AlertDialog(
         modifier = modifier,
-        icon = { Icon(icon, "icon") },
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        icon = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp),
+            )
+        },
         onDismissRequest = onClickCancel,
         confirmButton = {
             if (confirmText.isNotEmpty()) {
@@ -46,21 +55,29 @@ fun Dialog(
                 }
             }
         },
+        title = if (title.isNotEmpty()) {
+            {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = title,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        } else {
+            null
+        },
         text = {
             Column {
-                if (title.isNotEmpty()) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = title,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.headlineSmall,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Spacer(modifier = Modifier.padding(8.dp))
                 if (text.isNotEmpty()) {
                     Text(
+                        modifier = Modifier.fillMaxWidth(),
                         text = text,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 content()

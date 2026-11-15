@@ -18,6 +18,7 @@ import me.nathan.dsusideloader.R
 import me.nathan.dsusideloader.ui.cards.LogcatCard
 import me.nathan.dsusideloader.ui.components.CustomBottomSheet
 import me.nathan.dsusideloader.ui.components.buttons.PrimaryButton
+import me.nathan.dsusideloader.ui.components.buttons.SecondaryButton
 import me.nathan.dsusideloader.ui.util.launcherAcResult
 
 @Composable
@@ -43,9 +44,14 @@ fun ViewLogsBottomSheet(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 16.dp),
         ) {
             Spacer(modifier = Modifier.weight(1F))
+            SecondaryButton(
+                text = stringResource(id = R.string.cancel),
+                onClick = onDismiss,
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
             PrimaryButton(
                 text = stringResource(id = R.string.save_logs),
                 onClick = {

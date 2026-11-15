@@ -177,8 +177,13 @@
     <string name="version_info">version %1$s (%2$d)</string>
     <string name="check_updates_title">Check updates</string>
     <string name="check_updates_text_idle">Tap to check</string>
+    <string name="check_updates_text_checking">Checking for updates…</string>
+    <string name="check_updates_text_checking_description">Querying latest release from GitHub</string>
+    <string name="check_updates_status_update_available">Update available</string>
+    <string name="check_updates_status_up_to_date">Up to date</string>
     <string name="check_updates_text_found">New %1$s version found</string>
     <string name="check_updates_text_updated">Running latest version</string>
+    <string name="downloading_update">Downloading update…</string>
     <string name="changelog">Changelog</string>
     <string name="download">Download</string>
 

@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,7 @@ import me.nathan.dsusideloader.ui.cards.warnings.StorageWarningCard
 import me.nathan.dsusideloader.ui.cards.warnings.UnlockedBootloaderCard
 import me.nathan.dsusideloader.ui.cards.warnings.UnsupportedCard
 import me.nathan.dsusideloader.ui.components.ApplicationScreen
+import me.nathan.dsusideloader.ui.components.StatusChip
 import me.nathan.dsusideloader.ui.components.TopBar
 import me.nathan.dsusideloader.ui.screen.Destinations
 import me.nathan.dsusideloader.ui.sdialogs.CancelSheet
@@ -33,6 +36,7 @@ import me.nathan.dsusideloader.ui.sdialogs.ConfirmInstallationSheet
 import me.nathan.dsusideloader.ui.sdialogs.DiscardDSUSheet
 import me.nathan.dsusideloader.ui.sdialogs.ViewLogsBottomSheet
 import me.nathan.dsusideloader.ui.util.KeepScreenOn
+import me.nathan.dsusideloader.util.OperationMode
 import me.nathan.dsusideloader.util.collectAsStateWithLifecycle
 
 object HomeLinks {
@@ -60,12 +64,35 @@ fun Home(
         }
     }
 
+    val operationMode by homeViewModel.session.operationMode.collectAsStateWithLifecycle()
+    val modeText = when (operationMode) {
+        OperationMode.ROOT -> "Root"
+        OperationMode.SHIZUKU -> "Shizuku"
+        OperationMode.SYSTEM -> "System"
+        OperationMode.SYSTEM_AND_ROOT -> "Root & System"
+        OperationMode.ADB -> "ADB"
+    }
+
     ApplicationScreen(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.app_name),
+                statusChip = if (modeText.isNotEmpty()) {
+                    {
+                        StatusChip(
+                            text = modeText,
+                            dotColor = if (operationMode == OperationMode.ROOT || operationMode == OperationMode.SHIZUKU) {
+                                Color(0xFF4CAF50)
+                            } else {
+                                MaterialTheme.colorScheme.primary
+                            },
+                        )
+                    }
+                } else {
+                    null
+                },
                 scrollBehavior = it,
             )
         },
@@ -120,7 +147,7 @@ fun Home(
                     minPercentageOfFreeStorage = homeViewModel.allocPercentageInt.toString(),
                 )
                 UserdataCard(
-                    isEnabled = uiState.isInstalling(),
+                    isEnabled = !uiState.isInstalling(),
                     uiState = uiState.userDataCard,
                     onCheckedChange = { homeViewModel.onCheckUserdataCard() },
                     onValueChange = { homeViewModel.updateUserdataSize(it) },

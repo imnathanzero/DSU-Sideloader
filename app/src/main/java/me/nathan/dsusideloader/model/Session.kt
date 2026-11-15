@@ -20,9 +20,11 @@ class UserSelection(
     fun getUserDataSizeAsGB(): String = "${(this.userSelectedUserdata / 1024L / 1024L / 1024L)}"
 
     fun setUserDataSize(size: String) {
+        val digits = FilenameUtils.getDigits(size)
+        val gb = digits.toLongOrNull()
         userSelectedUserdata =
-            if (size.isNotEmpty()) {
-                (FilenameUtils.getDigits(size).toLong()) * 1024L * 1024L * 1024L
+            if (gb != null && gb > 0) {
+                gb * 1024L * 1024L * 1024L
             } else {
                 DSUConstants.DEFAULT_USERDATA
             }

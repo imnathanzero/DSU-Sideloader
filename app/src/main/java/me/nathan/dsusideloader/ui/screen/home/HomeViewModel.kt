@@ -203,6 +203,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onClickInstall() {
+        if (session.userSelection.selectedFileUri == Uri.EMPTY || session.userSelection.selectedFileName.isEmpty()) {
+            updateInstallationCard { it.copy(isError = true) }
+            return
+        }
         session.userSelection.setUserDataSize(uiState.value.userDataCard.text)
         updateSheetState(SheetDisplayState.CONFIRM_INSTALLATION)
     }
