@@ -1,13 +1,32 @@
 package me.nathan.dsusideloader.ui.screen.settings
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FlashOn
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.NewReleases
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.SdCard
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.nathan.dsusideloader.R
 import me.nathan.dsusideloader.preferences.AppPrefs
@@ -34,6 +53,8 @@ fun Settings(
     }
 
     ApplicationScreen(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.settings),
@@ -42,83 +63,143 @@ fun Settings(
             )
         },
     ) {
+        // Section: Installation
         Title(title = stringResource(id = R.string.installation))
-        PreferenceItem(
-            title = stringResource(id = R.string.builtin_installer),
-            description =
-            if (settingsViewModel.isAndroidQ()) {
-                stringResource(id = R.string.unsupported)
-            } else if (uiState.isRoot) {
-                stringResource(id = R.string.builtin_installer_description)
-            } else {
-                stringResource(R.string.requires_root)
-            },
-            showToggle = true,
-            isEnabled = uiState.isRoot && !settingsViewModel.isAndroidQ(),
-            isChecked = uiState.preferences[AppPrefs.USE_BUILTIN_INSTALLER]!!,
-            onClick = {
-                if (!it) {
-                    settingsViewModel.updateSheetDisplay(DialogSheetState.BUILT_IN_INSTALLER)
-                }
-                settingsViewModel.togglePreference(AppPrefs.USE_BUILTIN_INSTALLER, !it)
-            },
-        )
-        PreferenceItem(
-            title = stringResource(id = R.string.unmount_sd_title),
-            description = stringResource(id = R.string.unmount_sd_description),
-            showToggle = true,
-            isChecked = uiState.preferences[AppPrefs.UMOUNT_SD]!!,
-            onClick = { settingsViewModel.togglePreference(AppPrefs.UMOUNT_SD, !it) },
-        )
-        PreferenceItem(
-            title = stringResource(id = R.string.keep_screen_on),
-            showToggle = true,
-            isChecked = uiState.preferences[AppPrefs.KEEP_SCREEN_ON]!!,
-            onClick = { settingsViewModel.togglePreference(AppPrefs.KEEP_SCREEN_ON, !it) },
-        )
-        PreferenceItem(
-            title = stringResource(id = R.string.preserve_userdata_title),
-            description = stringResource(id = R.string.preserve_userdata_description),
-            showToggle = true,
-            isChecked = uiState.preferences[AppPrefs.PRESERVE_USERDATA]!!,
-            onClick = { settingsViewModel.togglePreference(AppPrefs.PRESERVE_USERDATA, !it) },
-        )
-
-        if (uiState.isDevOptEnabled) {
-            Title(title = stringResource(id = R.string.developer_options))
-            PreferenceItem(
-                title = stringResource(id = R.string.storage_check_title),
-                description = stringResource(id = R.string.storage_check_description),
-                showToggle = true,
-                isChecked = uiState.preferences[AppPrefs.DISABLE_STORAGE_CHECK]!!,
-                onClick = {
-                    if (!it) {
-                        settingsViewModel.updateSheetDisplay(DialogSheetState.DISABLE_STORAGE_CHECK)
-                    }
-                    settingsViewModel.togglePreference(AppPrefs.DISABLE_STORAGE_CHECK, !it)
-                },
-            )
-            if (settingsViewModel.getOperationMode() != OperationMode.ADB) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 1.dp,
+        ) {
+            Column {
                 PreferenceItem(
-                    title = stringResource(id = R.string.full_logcat_logging_title),
-                    description = stringResource(id = R.string.full_logcat_logging_description),
+                    title = stringResource(id = R.string.builtin_installer),
+                    description =
+                    if (settingsViewModel.isAndroidQ()) {
+                        stringResource(id = R.string.unsupported)
+                    } else if (uiState.isRoot) {
+                        stringResource(id = R.string.builtin_installer_description)
+                    } else {
+                        stringResource(R.string.requires_root)
+                    },
+                    icon = Icons.Outlined.FlashOn,
                     showToggle = true,
-                    isChecked = uiState.preferences[AppPrefs.FULL_LOGCAT_LOGGING]!!,
-                    onClick = { settingsViewModel.togglePreference(AppPrefs.FULL_LOGCAT_LOGGING, !it) },
+                    isEnabled = uiState.isRoot && !settingsViewModel.isAndroidQ(),
+                    isChecked = uiState.preferences[AppPrefs.USE_BUILTIN_INSTALLER] ?: false,
+                    onClick = {
+                        if (!it) {
+                            settingsViewModel.updateSheetDisplay(DialogSheetState.BUILT_IN_INSTALLER)
+                        }
+                        settingsViewModel.togglePreference(AppPrefs.USE_BUILTIN_INSTALLER, !it)
+                    },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.unmount_sd_title),
+                    description = stringResource(id = R.string.unmount_sd_description),
+                    icon = Icons.Outlined.SdCard,
+                    showToggle = true,
+                    isChecked = uiState.preferences[AppPrefs.UMOUNT_SD] ?: false,
+                    onClick = { settingsViewModel.togglePreference(AppPrefs.UMOUNT_SD, !it) },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.keep_screen_on),
+                    icon = Icons.Outlined.LightMode,
+                    showToggle = true,
+                    isChecked = uiState.preferences[AppPrefs.KEEP_SCREEN_ON] ?: false,
+                    onClick = { settingsViewModel.togglePreference(AppPrefs.KEEP_SCREEN_ON, !it) },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.preserve_userdata_title),
+                    description = stringResource(id = R.string.preserve_userdata_description),
+                    icon = Icons.Outlined.Save,
+                    showToggle = true,
+                    isChecked = uiState.preferences[AppPrefs.PRESERVE_USERDATA] ?: false,
+                    onClick = { settingsViewModel.togglePreference(AppPrefs.PRESERVE_USERDATA, !it) },
                 )
             }
         }
 
+        // Section: Developer Options
+        if (uiState.isDevOptEnabled) {
+            Title(title = stringResource(id = R.string.developer_options))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                tonalElevation = 1.dp,
+            ) {
+                Column {
+                    PreferenceItem(
+                        title = stringResource(id = R.string.storage_check_title),
+                        description = stringResource(id = R.string.storage_check_description),
+                        icon = Icons.Outlined.WarningAmber,
+                        showToggle = true,
+                        isChecked = uiState.preferences[AppPrefs.DISABLE_STORAGE_CHECK] ?: false,
+                        onClick = {
+                            if (!it) {
+                                settingsViewModel.updateSheetDisplay(DialogSheetState.DISABLE_STORAGE_CHECK)
+                            }
+                            settingsViewModel.togglePreference(AppPrefs.DISABLE_STORAGE_CHECK, !it)
+                        },
+                    )
+                    if (settingsViewModel.getOperationMode() != OperationMode.ADB) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                        )
+                        PreferenceItem(
+                            title = stringResource(id = R.string.full_logcat_logging_title),
+                            description = stringResource(id = R.string.full_logcat_logging_description),
+                            icon = Icons.Outlined.Terminal,
+                            showToggle = true,
+                            isChecked = uiState.preferences[AppPrefs.FULL_LOGCAT_LOGGING] ?: false,
+                            onClick = { settingsViewModel.togglePreference(AppPrefs.FULL_LOGCAT_LOGGING, !it) },
+                        )
+                    }
+                }
+            }
+        }
+
+        // Section: System & About
         Title(title = stringResource(id = R.string.other))
-        PreferenceItem(
-            title = stringResource(id = R.string.operation_mode),
-            description = settingsViewModel.checkOperationMode(),
-        )
-        PreferenceItem(
-            title = stringResource(id = R.string.about),
-            description = stringResource(id = R.string.about_description),
-            onClick = { navigate(Destinations.About) },
-        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 1.dp,
+        ) {
+            Column {
+                PreferenceItem(
+                    title = stringResource(id = R.string.operation_mode),
+                    description = settingsViewModel.checkOperationMode(),
+                    icon = Icons.Outlined.Security,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.about),
+                    description = stringResource(id = R.string.about_description),
+                    icon = Icons.Outlined.Info,
+                    onClick = { navigate(Destinations.About) },
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
     when (uiState.dialogSheetDisplay) {
