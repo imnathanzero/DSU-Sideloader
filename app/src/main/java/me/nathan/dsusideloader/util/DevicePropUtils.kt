@@ -12,7 +12,6 @@ class DevicePropUtils {
          * If not set, then return default values from gsid (which is 40%)
          *
          * @return Minimum percentage allowed by gsid binary (default is 0.40F)
-         * @see :magisk-module
          */
         fun getGsidBinaryAllowedPerc(): Float {
             val minAllowed = getSystemProperty("ro.me.nathan.dsusideloader.gsid_min_alloc").ifEmpty {
