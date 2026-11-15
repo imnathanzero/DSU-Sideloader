@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -72,7 +73,10 @@ fun MainScreen(
                 items = navItems,
                 onTabSelected = { page ->
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(page)
+                        pagerState.animateScrollToPage(
+                            page = page,
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
+                        )
                     }
                 },
             )
@@ -80,6 +84,9 @@ fun MainScreen(
     ) { innerPadding ->
         HorizontalPager(
             state = pagerState,
+            beyondViewportPageCount = 1,
+            userScrollEnabled = true,
+            pageSpacing = 16.dp,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = innerPadding.calculateBottomPadding()),
@@ -115,13 +122,13 @@ fun Navigation() {
         },
         exitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> -fullWidth / 4 },
+                targetOffsetX = { fullWidth -> -fullWidth },
                 animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
             ) + fadeOut(animationSpec = tween(250))
         },
         popEnterTransition = {
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> -fullWidth / 4 },
+                initialOffsetX = { fullWidth -> -fullWidth },
                 animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
             ) + fadeIn(animationSpec = tween(350))
         },
