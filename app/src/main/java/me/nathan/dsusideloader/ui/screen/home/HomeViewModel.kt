@@ -11,8 +11,10 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.superuser.Shell
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,9 +30,11 @@ import me.nathan.dsusideloader.installer.privileged.LogcatDiagnostic
 import me.nathan.dsusideloader.installer.root.DSUInstaller
 import me.nathan.dsusideloader.model.DSUInstallationSource
 import me.nathan.dsusideloader.model.Session
+import me.nathan.dsusideloader.notification.InstallationNotificationManager
 import me.nathan.dsusideloader.preferences.AppPrefs
 import me.nathan.dsusideloader.preparation.InstallationStep
 import me.nathan.dsusideloader.preparation.Preparation
+import me.nathan.dsusideloader.service.DsuInstallationService
 import me.nathan.dsusideloader.service.PrivilegedProvider
 import me.nathan.dsusideloader.util.DevicePropUtils
 import me.nathan.dsusideloader.util.FilenameUtils
@@ -44,6 +48,7 @@ class HomeViewModel @Inject constructor(
     override val dataStore: DataStore<Preferences>,
     private val storageManager: StorageManager,
     var session: Session,
+    private val notificationManager: InstallationNotificationManager,
 ) : BaseViewModel(dataStore) {
 
     private val tag = this.javaClass.simpleName
@@ -56,6 +61,7 @@ class HomeViewModel @Inject constructor(
     var checkReadLogsPermission = true
     var disabledStorageCheck = false
 
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     var installationJob: Job = Job()
     var logger: LogcatDiagnostic? = null
 
@@ -82,13 +88,16 @@ class HomeViewModel @Inject constructor(
     private fun updateSheetState(sheetDisplay: SheetDisplayState) =
         _uiState.update { it.copy(sheetDisplay = sheetDisplay) }
 
-    fun resetInstallationCard() =
+    fun resetInstallationCard() {
+        DsuInstallationService.stop(application)
+        notificationManager.cancel()
         _uiState.update {
             it.copy(
                 installationCard = InstallationCardState(),
                 sheetDisplay = SheetDisplayState.NONE,
             )
         }
+    }
 
     fun dismissSheet() = updateSheetState(SheetDisplayState.NONE)
 
@@ -202,7 +211,13 @@ class HomeViewModel @Inject constructor(
         dismissSheet()
         updateInstallationCard { it.copy(installationStep = InstallationStep.PROCESSING) }
         installationJob = Job()
-        viewModelScope.launch(Dispatchers.IO + installationJob) {
+        DsuInstallationService.activeJob = installationJob
+        DsuInstallationService.onCancelListener = { onClickCancelInstallationButton() }
+        DsuInstallationService.onDiscardListener = { onClickDiscardGsi() }
+        DsuInstallationService.start(application)
+        notificationManager.showProgress(InstallationStep.PROCESSING, 0f, "", force = true)
+
+        appScope.launch(installationJob) {
             session.preferences.isUnmountSdCard = readBoolPref(AppPrefs.UMOUNT_SD)
             session.preferences.useBuiltinInstaller = readBoolPref(AppPrefs.USE_BUILTIN_INSTALLER)
             session.preferences.preserveUserdata = readBoolPref(AppPrefs.PRESERVE_USERDATA)
@@ -229,6 +244,7 @@ class HomeViewModel @Inject constructor(
         updateInstallationCard { it.copy(installationStep = InstallationStep.PROCESSING) }
 
         if (session.getOperationMode() == OperationMode.ADB) {
+            DsuInstallationService.stop(application)
             setupAdbInstallation()
             return
         }
@@ -267,11 +283,11 @@ class HomeViewModel @Inject constructor(
 
     private fun startPrivilegedInstallation() {
         updateInstallationCard { it.copy(installationStep = InstallationStep.WAITING_USER_CONFIRMATION) }
-        DsuInstallationHandler(session).startInstallation()
+        DsuInstallationHandler(application, session).startInstallation()
         if (session.isRoot() || OperationModeUtils.isReadLogsPermissionGranted(application)) {
             startLogging()
         } else {
-            updateInstallationCard { it.copy(installationStep = InstallationStep.INSTALL_SUCCESS) }
+            onInstallationSuccess()
         }
     }
 
@@ -286,7 +302,7 @@ class HomeViewModel @Inject constructor(
                 onLogLineReceived = this::onLogLineReceived,
             )
         }
-        viewModelScope.launch(Dispatchers.IO + installationJob) {
+        appScope.launch(installationJob) {
             logger!!.shouldLogEverything = readBoolPref(AppPrefs.FULL_LOGCAT_LOGGING)
             logger!!.startLogging(generateUsefulLogInfo())
         }
@@ -500,10 +516,14 @@ class HomeViewModel @Inject constructor(
     //
 
     private fun onRootInstallationSuccess() {
+        DsuInstallationService.finishSuccess(application)
+        notificationManager.showSuccess()
         updateInstallationCard { it.copy(installationStep = InstallationStep.INSTALL_SUCCESS_REBOOT_DYN_OS) }
     }
 
     private fun onInstallationSuccess() {
+        DsuInstallationService.finishSuccess(application)
+        notificationManager.showSuccess()
         updateInstallationCard { it.copy(installationStep = InstallationStep.INSTALL_SUCCESS) }
     }
 
@@ -511,13 +531,24 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(installationLogs = logger!!.logs) }
     }
 
-    private fun onStepUpdate(step: InstallationStep) =
+    private fun onStepUpdate(step: InstallationStep) {
+        if (step == InstallationStep.INSTALL_SUCCESS || step == InstallationStep.INSTALL_SUCCESS_REBOOT_DYN_OS) {
+            DsuInstallationService.finishSuccess(application)
+            notificationManager.showSuccess()
+        } else {
+            notificationManager.showProgress(step = step, progress = 0f, force = true)
+        }
         updateInstallationCard { it.copy(installationStep = step) }
+    }
 
-    private fun onPreparationProgressUpdate(progress: Float) =
+    private fun onPreparationProgressUpdate(progress: Float) {
+        notificationManager.showProgress(step = InstallationStep.PROCESSING, progress = progress)
         updateInstallationCard { it.copy(installationProgress = progress) }
+    }
 
-    private fun onInstallationError(error: InstallationStep, errorContent: String) =
+    private fun onInstallationError(error: InstallationStep, errorContent: String) {
+        DsuInstallationService.finishError(application, errorContent)
+        notificationManager.showError(errorContent)
         updateInstallationCard {
             if (error == InstallationStep.ERROR_SELINUX && !session.isRoot()) {
                 it.copy(
@@ -528,17 +559,27 @@ class HomeViewModel @Inject constructor(
                 it.copy(installationStep = error, errorText = errorContent)
             }
         }
+    }
 
-    private fun onInstallationProgressUpdate(progress: Float, partition: String) =
+    private fun onInstallationProgressUpdate(progress: Float, partition: String) {
+        notificationManager.showProgress(step = InstallationStep.INSTALLING, progress = progress, partition = partition)
         updateInstallationCard {
             it.copy(currentPartitionText = partition, installationProgress = progress)
         }
+    }
 
-    private fun onCreatePartition(partition: String) =
+    private fun onCreatePartition(partition: String) {
+        notificationManager.showProgress(
+            step = InstallationStep.CREATING_PARTITION,
+            progress = 0f,
+            partition = partition,
+            force = true,
+        )
         updateInstallationCard {
             it.copy(
                 installationStep = InstallationStep.CREATING_PARTITION,
                 currentPartitionText = partition,
             )
         }
+    }
 }

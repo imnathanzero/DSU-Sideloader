@@ -14,6 +14,7 @@ import com.topjohnwu.superuser.ipc.RootService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import me.nathan.dsusideloader.model.Session
+import me.nathan.dsusideloader.service.DsuInstallationService
 import me.nathan.dsusideloader.service.PrivilegedProvider
 import me.nathan.dsusideloader.service.PrivilegedRootService
 import me.nathan.dsusideloader.service.PrivilegedService
@@ -35,6 +36,19 @@ class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListe
     private val tag = this.javaClass.simpleName
 
     private var shouldCheckShizuku = false
+
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { isGranted ->
+            Log.d(tag, "Notification permission result: $isGranted")
+        }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
     private fun setupSessionOperationMode() {
         val operationMode = OperationModeUtils.getOperationMode(application, shouldCheckShizuku)
@@ -139,9 +153,13 @@ class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListe
             }
         }
 
+        requestNotificationPermissionIfNeeded()
+
         if (savedInstanceState == null) {
             setupSessionOperationMode()
-            setupService()
+            if (!PrivilegedProvider.isConnected()) {
+                setupService()
+            }
         }
     }
 
@@ -153,6 +171,10 @@ class MainActivity : ComponentActivity(), Shizuku.OnRequestPermissionResultListe
     override fun onDestroy() {
         super.onDestroy()
         if (isChangingConfigurations) {
+            return
+        }
+        if (DsuInstallationService.isRunning) {
+            Log.d(tag, "Installation running in foreground service, keeping service bound.")
             return
         }
         when (session.getOperationMode()) {

@@ -244,4 +244,16 @@
 
     <string name="close_app">Close app</string>
     <string name="close_app_question">Close app?</string>
+
+    <!-- Notification strings -->
+    <string name="notification_channel_progress">DSU Installation Progress</string>
+    <string name="notification_channel_alerts">DSU Installation Alerts</string>
+    <string name="notification_installing_title">Installing DSU: %s</string>
+    <string name="notification_preparing_title">Preparing DSU Installation</string>
+    <string name="notification_writing_partition">Writing %1$s partition: %2$d%%</string>
+    <string name="notification_creating_partition">Creating %s partition…</string>
+    <string name="notification_processing_image">Processing installation image…</string>
+    <string name="notification_success_title">DSU Installation Complete!</string>
+    <string name="notification_success_desc">Dynamic system is ready. Tap to reboot or discard.</string>
+    <string name="notification_error_title">DSU Installation Failed</string>
 </resources>

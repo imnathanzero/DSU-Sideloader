@@ -1,5 +1,6 @@
 package me.nathan.dsusideloader.installer.privileged
 
+import android.content.Context
 import android.content.Intent
 import android.os.storage.VolumeInfo
 import android.util.Log
@@ -16,6 +17,7 @@ import me.nathan.dsusideloader.service.PrivilegedProvider
  * Supported modes are: Shizuku (as shell or root), root and system
  */
 open class DsuInstallationHandler(
+    private val context: Context,
     private val session: Session,
 ) {
 
@@ -33,6 +35,16 @@ open class DsuInstallationHandler(
         val fileUri = session.dsuInstallation.uri
         val length = session.dsuInstallation.fileSize
 
+        try {
+            context.grantUriPermission(
+                "com.android.dynsystem",
+                fileUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION,
+            )
+        } catch (e: Exception) {
+            Log.w(tag, "Could not grant URI permission to com.android.dynsystem", e)
+        }
+
         PrivilegedProvider.run {
             setDynProp()
             forceStopPackage("com.android.dynsystem")
@@ -42,7 +54,7 @@ open class DsuInstallationHandler(
                 "com.android.dynsystem",
                 "com.android.dynsystem.VerificationActivity",
             )
-            dynIntent.flags += Intent.FLAG_ACTIVITY_NEW_TASK
+            dynIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
             dynIntent.action = "android.os.image.action.START_INSTALL"
             dynIntent.data = fileUri
             dynIntent.putExtra("KEY_USERDATA_SIZE", userdataSize)
