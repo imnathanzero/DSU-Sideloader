@@ -76,8 +76,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+        }
         create("miniDebug") {
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
             isDebuggable = true
             isMinifyEnabled = true
             isShrinkResources = true
