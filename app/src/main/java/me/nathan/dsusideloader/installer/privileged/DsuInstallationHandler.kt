@@ -29,7 +29,7 @@ open class DsuInstallationHandler(
     }
 
     private fun forwardInstallationToDSU() {
-        val userdataSize = session.userSelection.userSelectedUserdata
+        val userdataSize = if (session.preferences.preserveUserdata) 0L else session.userSelection.userSelectedUserdata
         val fileUri = session.dsuInstallation.uri
         val length = session.dsuInstallation.fileSize
 

@@ -8,6 +8,7 @@ import me.nathan.dsusideloader.util.OperationMode
 data class InstallationPreferences(
     var isUnmountSdCard: Boolean = false,
     var useBuiltinInstaller: Boolean = false,
+    var preserveUserdata: Boolean = false,
 )
 
 class UserSelection(
@@ -57,7 +58,7 @@ class Session(
     var installationScriptPath = ""
 
     fun getInstallationParameters(): Triple<Long, String, Long> {
-        val userdataSize = userSelection.userSelectedUserdata
+        val userdataSize = if (preferences.preserveUserdata) 0L else userSelection.userSelectedUserdata
         val absoluteFilePath = FilenameUtils.getFilePath(dsuInstallation.uri, true)
         val imageSize = dsuInstallation.fileSize
         return Triple(userdataSize, absoluteFilePath, imageSize)

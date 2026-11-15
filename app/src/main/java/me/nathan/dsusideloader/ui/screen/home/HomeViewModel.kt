@@ -205,6 +205,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO + installationJob) {
             session.preferences.isUnmountSdCard = readBoolPref(AppPrefs.UMOUNT_SD)
             session.preferences.useBuiltinInstaller = readBoolPref(AppPrefs.USE_BUILTIN_INSTALLER)
+            session.preferences.preserveUserdata = readBoolPref(AppPrefs.PRESERVE_USERDATA)
             Preparation(
                 storageManager = storageManager,
                 session = session,
@@ -260,6 +261,7 @@ class HomeViewModel @Inject constructor(
             onCreatePartition = this::onCreatePartition,
             onInstallationStepUpdate = this::onStepUpdate,
             onInstallationSuccess = this::onRootInstallationSuccess,
+            preserveUserdata = session.preferences.preserveUserdata,
         ).invoke()
     }
 

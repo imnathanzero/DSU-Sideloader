@@ -158,6 +158,9 @@
 
     <string name="keep_screen_on">Keep screen on</string>
 
+    <string name="preserve_userdata_title">Preserve userdata</string>
+    <string name="preserve_userdata_description">Do not wipe or reallocate userdata when updating an installed DSU</string>
+
     <string name="developer_options">Developer options</string>
 
     <string name="other">Other</string>
