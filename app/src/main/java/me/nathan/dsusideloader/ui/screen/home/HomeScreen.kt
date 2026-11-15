@@ -4,8 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,9 +66,7 @@ fun Home(
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.app_name),
-                icon = Icons.Outlined.Settings,
                 scrollBehavior = it,
-                onClickIcon = { navigate(Destinations.Preferences) },
             )
         },
         content = {

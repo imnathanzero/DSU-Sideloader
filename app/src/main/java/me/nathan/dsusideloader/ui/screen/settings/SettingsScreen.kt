@@ -25,6 +25,7 @@ import me.nathan.dsusideloader.util.collectAsStateWithLifecycle
 fun Settings(
     navigate: (String) -> Unit,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
+    isSubScreen: Boolean = false,
 ) {
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -37,7 +38,7 @@ fun Settings(
             TopBar(
                 barTitle = stringResource(id = R.string.settings),
                 scrollBehavior = it,
-                onClickBackButton = { navigate(Destinations.Up) },
+                onClickBackButton = if (isSubScreen) { { navigate(Destinations.Up) } } else null,
             )
         },
     ) {

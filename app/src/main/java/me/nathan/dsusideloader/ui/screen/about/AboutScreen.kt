@@ -35,6 +35,7 @@ object AboutLinks {
 fun AboutScreen(
     navigate: (String) -> Unit,
     aboutViewModel: AboutViewModel = hiltViewModel(),
+    isSubScreen: Boolean = false,
 ) {
     val uiState by aboutViewModel.uiState.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
@@ -69,7 +70,7 @@ fun AboutScreen(
             TopBar(
                 barTitle = stringResource(id = R.string.about),
                 scrollBehavior = it,
-                onClickBackButton = { navigate(Destinations.Up) },
+                onClickBackButton = if (isSubScreen) { { navigate(Destinations.Up) } } else null,
             )
         },
     ) {
