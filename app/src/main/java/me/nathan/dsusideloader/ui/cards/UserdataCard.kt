@@ -3,19 +3,31 @@ package me.nathan.dsusideloader.ui.cards
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import me.nathan.dsusideloader.R
-import me.nathan.dsusideloader.ui.components.CardBox
 import me.nathan.dsusideloader.ui.components.FileSelectionBox
 import me.nathan.dsusideloader.ui.screen.home.UserDataCardState
 
@@ -27,40 +39,71 @@ fun UserdataCard(
     onValueChange: (String) -> Unit,
     onCheckedChange: (Boolean) -> Unit = {},
 ) {
-    CardBox(
-        modifier = modifier,
-        cardTitle = stringResource(id = R.string.userdata_size),
-        addToggle = true,
-        isToggleEnabled = !isEnabled,
-        isToggleChecked = uiState.isSelected,
-        onCheckedChange = onCheckedChange,
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(22.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+            .padding(16.dp),
     ) {
-        AnimatedVisibility(
-            visible = uiState.isSelected,
-            enter = expandVertically(),
-            exit = shrinkVertically(),
-        ) {
-            Column {
-                FileSelectionBox(
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    isEnabled = !isEnabled,
-                    isError = uiState.isError,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    textFieldValue = uiState.text,
-                    textFieldTitle = stringResource(id = R.string.userdata_size_info),
-                    onValueChange = onValueChange,
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Storage,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
                 )
-                AnimatedVisibility(visible = uiState.isError) {
+                Spacer(modifier = Modifier.size(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        modifier = Modifier.padding(start = 1.dp),
-                        text = stringResource(
-                            id = R.string.allowed_userdata_allocation,
-                            uiState.maximumAllowed,
-                        ),
-                        color = MaterialTheme.colorScheme.error,
-                        lineHeight = 14.sp,
-                        fontSize = 14.sp,
+                        text = stringResource(id = R.string.userdata_size),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
+                    Text(
+                        text = stringResource(id = R.string.userdata_size_info),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = uiState.isSelected,
+                    onCheckedChange = onCheckedChange,
+                    enabled = isEnabled,
+                )
+            }
+
+            AnimatedVisibility(
+                visible = uiState.isSelected,
+                enter = expandVertically(),
+                exit = shrinkVertically(),
+            ) {
+                Column(modifier = Modifier.padding(top = 12.dp)) {
+                    FileSelectionBox(
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        isEnabled = isEnabled,
+                        isError = uiState.isError,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        textFieldValue = uiState.text,
+                        textFieldTitle = stringResource(id = R.string.userdata_size_info),
+                        onValueChange = onValueChange,
+                    )
+                    AnimatedVisibility(visible = uiState.isError) {
+                        Text(
+                            modifier = Modifier.padding(start = 2.dp, top = 4.dp),
+                            text = stringResource(
+                                id = R.string.allowed_userdata_allocation,
+                                uiState.maximumAllowed,
+                            ),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
             }
         }

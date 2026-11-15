@@ -16,7 +16,7 @@ fun SimpleCard(
     text: String = "",
     addToggle: Boolean = false,
     isToggleEnabled: Boolean = false,
-    cardColor: Color = MaterialTheme.colorScheme.inverseOnSurface,
+    cardColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
     justifyText: Boolean = false,
     textScrollable: Boolean = false,
     addPadding: Boolean = true,
