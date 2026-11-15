@@ -1,8 +1,29 @@
 package me.nathan.dsusideloader.ui.screen.about
 
+import android.os.Build
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Android
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.CollectionsBookmark
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Layers
+import androidx.compose.material.icons.outlined.Memory
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Smartphone
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,17 +38,19 @@ import me.nathan.dsusideloader.R
 import me.nathan.dsusideloader.ui.cards.updater.UpdaterCard
 import me.nathan.dsusideloader.ui.components.ApplicationScreen
 import me.nathan.dsusideloader.ui.components.PreferenceItem
-import me.nathan.dsusideloader.ui.components.SimpleCard
 import me.nathan.dsusideloader.ui.components.Title
 import me.nathan.dsusideloader.ui.components.TopBar
 import me.nathan.dsusideloader.ui.screen.Destinations
+import me.nathan.dsusideloader.util.DevicePropUtils
 import me.nathan.dsusideloader.util.collectAsStateWithLifecycle
 
 object AboutLinks {
     const val CONTRIBUTORS_URL = "https://github.com/VegaBobo/DSU-Sideloader/graphs/contributors"
-    const val REPOSITORY_URL = "https://github.com/VegaBobo/DSU-Sideloader"
+    const val REPOSITORY_URL = "https://github.com/imnathanzero/DSU-Sideloader"
+    const val VEGABOBO_REPO = "https://github.com/VegaBobo/DSU-Sideloader"
     const val WSTXDA_GITHUB = "https://github.com/WSTxda"
     const val VEGABOBO_GITHUB = "https://github.com/VegaBobo"
+    const val NATHAN_GITHUB = "https://github.com/imnathanzero"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +88,8 @@ fun AboutScreen(
     }
 
     ApplicationScreen(
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         topBar = {
             TopBar(
                 barTitle = stringResource(id = R.string.about),
@@ -74,6 +98,7 @@ fun AboutScreen(
             )
         },
     ) {
+        // App header & updater
         UpdaterCard(
             uiState = uiState.updaterCardState,
             isUpdaterAvailable = uiState.isUpdaterAvailable,
@@ -82,53 +107,160 @@ fun AboutScreen(
             onClickDownloadUpdate = { aboutViewModel.onClickDownloadUpdate() },
             onClickViewChangelog = { uriHandler.openUri(aboutViewModel.response.changelogUrl) },
         )
+
+        // Section: Device Information
         Title(
-            stringResource(id = R.string.application),
-            modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
+            "Device Information",
+            modifier = Modifier.padding(top = 4.dp),
         )
-        SimpleCard(
-            addPadding = false,
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 1.dp,
         ) {
-            PreferenceItem(
-                title = stringResource(id = R.string.github_repo),
-                description = stringResource(id = R.string.github_repo_description),
-                onClick = { uriHandler.openUri(AboutLinks.REPOSITORY_URL) },
-            )
-            PreferenceItem(
-                title = stringResource(id = R.string.libraries_title),
-                description = stringResource(id = R.string.libraries_description),
-                onClick = { navigate(Destinations.Libraries) },
-            )
-        }
-        Title(
-            stringResource(id = R.string.collaborators),
-            modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
-        )
-        SimpleCard(
-            addPadding = false,
-        ) {
-            PreferenceItem(
-                title = "VegaBobo",
-                description = stringResource(id = R.string.role_developer),
-                onClick = { uriHandler.openUri(AboutLinks.VEGABOBO_GITHUB) },
-            )
-            PreferenceItem(
-                title = "WSTxda",
-                description = stringResource(id = R.string.role_design_icon),
-                onClick = { uriHandler.openUri(AboutLinks.WSTXDA_GITHUB) },
-            )
-            val translators = stringResource(id = R.string.translators_list)
-            if (translators.isNotEmpty() && translators != "translators_list") {
+            Column {
+                val manufacturer = Build.MANUFACTURER.replaceFirstChar { it.uppercase() }
                 PreferenceItem(
-                    title = stringResource(id = R.string.translators_title),
-                    description = stringResource(id = R.string.translators_list),
+                    title = "$manufacturer ${Build.MODEL}",
+                    description = "Device Model (${Build.DEVICE})",
+                    icon = Icons.Outlined.Smartphone,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = "Android ${Build.VERSION.RELEASE}",
+                    description = "API Level ${Build.VERSION.SDK_INT}",
+                    icon = Icons.Outlined.Android,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = Build.VERSION.SECURITY_PATCH,
+                    description = "Security Patch Level",
+                    icon = Icons.Outlined.Security,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                val hasDynamic = DevicePropUtils.hasDynamicPartitions()
+                PreferenceItem(
+                    title = if (hasDynamic) "Supported" else "Unsupported",
+                    description = "Dynamic Partitions Status",
+                    icon = Icons.Outlined.Layers,
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                val primaryAbi = Build.SUPPORTED_ABIS.firstOrNull() ?: "Unknown"
+                PreferenceItem(
+                    title = primaryAbi,
+                    description = "Primary Architecture / ABI",
+                    icon = Icons.Outlined.Memory,
                 )
             }
-            PreferenceItem(
-                title = stringResource(id = R.string.contributors_title),
-                description = stringResource(id = R.string.contributors_text),
-                onClick = { uriHandler.openUri(AboutLinks.CONTRIBUTORS_URL) },
-            )
         }
+
+        // Section: Application & Links
+        Title(
+            stringResource(id = R.string.application),
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 1.dp,
+        ) {
+            Column {
+                PreferenceItem(
+                    title = stringResource(id = R.string.github_repo),
+                    description = stringResource(id = R.string.github_repo_description),
+                    icon = Icons.Outlined.Code,
+                    onClick = { uriHandler.openUri(AboutLinks.REPOSITORY_URL) },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.libraries_title),
+                    description = stringResource(id = R.string.libraries_description),
+                    icon = Icons.Outlined.CollectionsBookmark,
+                    onClick = { navigate(Destinations.Libraries) },
+                )
+            }
+        }
+
+        // Section: Collaborators & Credits
+        Title(
+            stringResource(id = R.string.collaborators),
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 1.dp,
+        ) {
+            Column {
+                PreferenceItem(
+                    title = "Nathan (@imnathanzero)",
+                    description = "Fork Maintainer / Material 3 Revamp",
+                    icon = Icons.Outlined.Person,
+                    onClick = { uriHandler.openUri(AboutLinks.NATHAN_GITHUB) },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = "VegaBobo",
+                    description = stringResource(id = R.string.role_developer),
+                    icon = Icons.Outlined.Person,
+                    onClick = { uriHandler.openUri(AboutLinks.VEGABOBO_GITHUB) },
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = "WSTxda",
+                    description = stringResource(id = R.string.role_design_icon),
+                    icon = Icons.Outlined.Person,
+                    onClick = { uriHandler.openUri(AboutLinks.WSTXDA_GITHUB) },
+                )
+                val translators = stringResource(id = R.string.translators_list)
+                if (translators.isNotEmpty() && translators != "translators_list") {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                    )
+                    PreferenceItem(
+                        title = stringResource(id = R.string.translators_title),
+                        description = stringResource(id = R.string.translators_list),
+                        icon = Icons.Outlined.Translate,
+                    )
+                }
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                )
+                PreferenceItem(
+                    title = stringResource(id = R.string.contributors_title),
+                    description = stringResource(id = R.string.contributors_text),
+                    icon = Icons.Outlined.Group,
+                    onClick = { uriHandler.openUri(AboutLinks.CONTRIBUTORS_URL) },
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
