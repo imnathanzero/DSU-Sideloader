@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
@@ -51,7 +49,7 @@ object Destinations {
 fun MainScreen(
     navigate: (String) -> Unit,
 ) {
-    val pagerState = rememberPagerState(initialPage = 0) { 3 }
+    val pagerState = rememberPagerState(initialPage = 0) { 2 }
     val coroutineScope = rememberCoroutineScope()
 
     val navItems = listOf(
@@ -64,11 +62,6 @@ fun MainScreen(
             title = stringResource(id = R.string.settings),
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings,
-        ),
-        NavigationTabItem(
-            title = stringResource(id = R.string.about),
-            selectedIcon = Icons.Filled.Info,
-            unselectedIcon = Icons.Outlined.Info,
         ),
     )
 
@@ -94,7 +87,6 @@ fun MainScreen(
             when (page) {
                 0 -> Home(navigate = navigate)
                 1 -> Settings(navigate = navigate, isSubScreen = false)
-                2 -> AboutScreen(navigate = navigate, isSubScreen = false)
             }
         }
     }
