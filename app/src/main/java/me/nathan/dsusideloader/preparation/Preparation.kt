@@ -4,7 +4,6 @@ import android.net.Uri
 import java.math.BigInteger
 import kotlinx.coroutines.Job
 import me.nathan.dsusideloader.core.StorageManager
-import me.nathan.dsusideloader.model.DSUConstants
 import me.nathan.dsusideloader.model.DSUInstallationSource
 import me.nathan.dsusideloader.model.Session
 
@@ -18,7 +17,6 @@ class Preparation(
     private val onPreparationFinished: (preparedDSU: DSUInstallationSource) -> Unit,
 ) : () -> Unit {
 
-    private val userSelectedImageSize = session.userSelection.userSelectedImageSize
     private val userSelectedFileUri = session.userSelection.selectedFileUri
 
     override fun invoke() {
@@ -123,10 +121,6 @@ class Preparation(
 
     private fun prepareGz(gzFile: Uri): Pair<Uri, Long> {
         val uri = getSafeUri(gzFile)
-        if (userSelectedImageSize != DSUConstants.DEFAULT_IMAGE_SIZE) {
-            return Pair(uri, userSelectedImageSize)
-        }
-
         onStepUpdate(InstallationStep.PROCESSING)
         val fileSize = storageManager.getFilesizeFromUri(uri)
         val three_gb = Int.MAX_VALUE.toLong() * 1.5 // 2^32 * 0.75

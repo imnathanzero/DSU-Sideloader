@@ -19,7 +19,6 @@ import kotlin.system.exitProcess
 import kotlinx.coroutines.flow.collectLatest
 import me.nathan.dsusideloader.R
 import me.nathan.dsusideloader.ui.cards.DsuInfoCard
-import me.nathan.dsusideloader.ui.cards.ImageSizeCard
 import me.nathan.dsusideloader.ui.cards.UserdataCard
 import me.nathan.dsusideloader.ui.cards.installation.InstallationCard
 import me.nathan.dsusideloader.ui.cards.warnings.GrantingPermissionCard
@@ -34,7 +33,6 @@ import me.nathan.dsusideloader.ui.screen.Destinations
 import me.nathan.dsusideloader.ui.sdialogs.CancelSheet
 import me.nathan.dsusideloader.ui.sdialogs.ConfirmInstallationSheet
 import me.nathan.dsusideloader.ui.sdialogs.DiscardDSUSheet
-import me.nathan.dsusideloader.ui.sdialogs.ImageSizeWarningSheet
 import me.nathan.dsusideloader.ui.sdialogs.ViewLogsBottomSheet
 import me.nathan.dsusideloader.ui.util.KeepScreenOn
 import me.nathan.dsusideloader.util.collectAsStateWithLifecycle
@@ -131,12 +129,6 @@ fun Home(
                     onCheckedChange = { homeViewModel.onCheckUserdataCard() },
                     onValueChange = { homeViewModel.updateUserdataSize(it) },
                 )
-                ImageSizeCard(
-                    isEnabled = uiState.isInstalling(),
-                    uiState = uiState.imageSizeCard,
-                    onCheckedChange = { homeViewModel.onCheckImageSizeCard() },
-                    onValueChange = { homeViewModel.updateImageSize(it) },
-                )
                 DsuInfoCard(
                     onClickViewDocs = { uriHandler.openUri(HomeLinks.DSU_DOCS) },
                     onClickLearnMore = { uriHandler.openUri(HomeLinks.DSU_LEARN_MORE) },
@@ -150,7 +142,6 @@ fun Home(
             ConfirmInstallationSheet(
                 filename = homeViewModel.obtainSelectedFilename(),
                 userdata = homeViewModel.session.userSelection.getUserDataSizeAsGB(),
-                fileSize = homeViewModel.session.userSelection.userSelectedImageSize,
                 onClickConfirm = { homeViewModel.onConfirmInstallationSheet() },
                 onClickCancel = { homeViewModel.dismissSheet() },
             )
@@ -159,12 +150,6 @@ fun Home(
             CancelSheet(
                 onClickConfirm = { homeViewModel.onClickCancelInstallationButton() },
                 onClickCancel = { homeViewModel.dismissSheet() },
-            )
-
-        SheetDisplayState.IMAGESIZE_WARNING ->
-            ImageSizeWarningSheet(
-                onClickConfirm = { homeViewModel.dismissSheet() },
-                onClickCancel = { homeViewModel.onCheckImageSizeCard() },
             )
 
         SheetDisplayState.DISCARD_DSU ->

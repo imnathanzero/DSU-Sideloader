@@ -21,11 +21,6 @@ data class UserDataCardState(
     val maximumAllowed: Int = 0,
 )
 
-data class ImageSizeCardState(
-    val isSelected: Boolean = false,
-    val text: String = "",
-)
-
 enum class AdditionalCardState {
     NONE,
     SETUP_STORAGE,
@@ -38,7 +33,6 @@ enum class AdditionalCardState {
 
 enum class SheetDisplayState {
     NONE,
-    IMAGESIZE_WARNING,
     CONFIRM_INSTALLATION,
     CANCEL_INSTALLATION,
     DISCARD_DSU,
@@ -48,7 +42,6 @@ enum class SheetDisplayState {
 data class HomeUiState(
     val installationCard: InstallationCardState = InstallationCardState(),
     val userDataCard: UserDataCardState = UserDataCardState(),
-    val imageSizeCard: ImageSizeCardState = ImageSizeCardState(),
     val additionalCard: AdditionalCardState = AdditionalCardState.NONE,
     val sheetDisplay: SheetDisplayState = SheetDisplayState.NONE,
     val installationLogs: String = "",

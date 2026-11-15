@@ -3,7 +3,6 @@ package me.nathan.dsusideloader.ui.sdialogs
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Storage
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import me.nathan.dsusideloader.R
-import me.nathan.dsusideloader.model.DSUConstants
 import me.nathan.dsusideloader.ui.components.DialogItem
 import me.nathan.dsusideloader.ui.components.DialogLikeBottomSheet
 
@@ -21,7 +19,6 @@ import me.nathan.dsusideloader.ui.components.DialogLikeBottomSheet
 fun ConfirmInstallationSheet(
     filename: String,
     userdata: String,
-    fileSize: Long,
     onClickConfirm: () -> Unit,
     onClickCancel: () -> Unit,
 ) {
@@ -43,14 +40,6 @@ fun ConfirmInstallationSheet(
                 text = "${userdata}GB",
                 textColor = MaterialTheme.colorScheme.onBackground,
             )
-            if (fileSize != DSUConstants.DEFAULT_IMAGE_SIZE) {
-                DialogItem(
-                    icon = Icons.Outlined.Article,
-                    title = "${stringResource(id = R.string.image_size)}:",
-                    text = "${fileSize}b",
-                    textColor = MaterialTheme.colorScheme.onBackground,
-                )
-            }
         },
         confirmText = stringResource(id = R.string.proceed),
         cancelText = stringResource(id = R.string.cancel),
